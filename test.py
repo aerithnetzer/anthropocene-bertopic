@@ -10,9 +10,9 @@ from cuml.manifold import UMAP
 
 
 def load_custom_dataset(
-    corpus_path="./big_corpus.txt",
-    categories_path="./big-categories.txt",
-    dates_path="./big_dates.txt",
+    corpus_path="~/big_corpus.txt",
+    categories_path="~/big-categories.txt",
+    dates_path="~/big_dates.txt",
     n_samples=None,
 ):
     """
