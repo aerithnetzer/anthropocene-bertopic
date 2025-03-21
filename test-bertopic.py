@@ -155,7 +155,7 @@ def train_bertopic(texts, dates, categories):
         hdbscan_model=HDBSCAN(min_cluster_size=15),
         verbose=True,
     )
-    topics, probs = topic_model.fit_transform(texts, dates, categories)
+    topics, probs = topic_model.fit_transform(texts)
     return topic_model
 
 
