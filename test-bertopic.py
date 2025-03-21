@@ -23,12 +23,15 @@ def load_first_jsonl_from_s3(
         bucket_name: The name of the S3 bucket
         prefix: The prefix to filter objects by (default: "constellate/")
     Returns:
-        A list of dictionaries containing the data from all JSONL files
+        A dataframe containing the data from the JSONL files
     """
     s3_client = boto3.client("s3")
     paginator = s3_client.get_paginator("list_objects_v2")
     response_iterator = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
+
+    # Create empty DataFrame - use pandas instead of cuDF for initial loading
     anthropocene_dataframe = pd.DataFrame()
+
     for response in tqdm(response_iterator, desc="Loading JSONL files"):
         if "Contents" in response:
             for obj in response["Contents"]:
@@ -38,11 +41,48 @@ def load_first_jsonl_from_s3(
                         Bucket=bucket_name, Key=obj["Key"]
                     )
                     jsonl_content = obj_response["Body"].read().decode("utf-8")
+
+                    # Use pandas to read the JSONL
                     df = pd.read_json(jsonl_content, lines=True)
                     print(df.columns)
-                    df = df[["datePublished", "tdmCategory", "fullText"]]
-                    pd.concat([anthropocene_dataframe, df], ignore_index=True)
+
+                    # Check for column names with case-insensitive matching
+                    date_col = next(
+                        (col for col in df.columns if col.lower() == "datepublished"),
+                        None,
+                    )
+                    category_col = next(
+                        (col for col in df.columns if col.lower() == "tdmcategory"),
+                        None,
+                    )
+                    text_col = next(
+                        (col for col in df.columns if col.lower() == "fulltext"), None
+                    )
+
+                    # Only proceed if all required columns exist
+                    if date_col and category_col and text_col:
+                        # Create a new DataFrame with just the columns we need
+                        subset_df = pd.DataFrame(
+                            {
+                                "datePublished": df[date_col],
+                                "tdmCategory": df[category_col],
+                                "fullText": df[text_col],
+                            }
+                        )
+
+                        # Concatenate to the main DataFrame
+                        if anthropocene_dataframe.empty:
+                            anthropocene_dataframe = subset_df
+                        else:
+                            anthropocene_dataframe = pd.concat(
+                                [anthropocene_dataframe, subset_df], ignore_index=True
+                            )
+                    else:
+                        print(f"Warning: Required columns not found in {obj['Key']}")
+
+                    # Only process the first JSONL file for now
                     break
+
     return anthropocene_dataframe
 
 
