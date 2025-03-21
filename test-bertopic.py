@@ -29,7 +29,7 @@ def load_first_jsonl_from_s3(
     paginator = s3_client.get_paginator("list_objects_v2")
     response_iterator = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
     anthropocene_dataframe = pd.DataFrame()
-    for response in response_iterator:
+    for response in tqdm(response_iterator, desc="Loading JSONL files"):
         if "Contents" in response:
             for obj in response["Contents"]:
                 if obj["Key"].endswith(".jsonl"):
@@ -39,7 +39,7 @@ def load_first_jsonl_from_s3(
                     )
                     jsonl_content = obj_response["Body"].read().decode("utf-8")
                     df = pd.read_json(jsonl_content, lines=True)
-                    df = df[["datePublished", "TDMCategory", "fullText"]]
+                    df = df[["datePublished", "tdmCategory", "fullText"]]
                     pd.concat([anthropocene_dataframe, df], ignore_index=True)
                     break
     return anthropocene_dataframe
@@ -67,7 +67,11 @@ def clean_text(text: str) -> str:
 
     # Remove stopwords
     stop_words = set(stopwords.words("english"))
-    tokens = [token for token in tokens if token not in stop_words and len(token) > 2]
+    tokens = [
+        token
+        for token in tqdm(tokens, desc="cleaning")
+        if token not in stop_words and len(token) > 2
+    ]
 
     # Rejoin tokens
     return " ".join(tokens)
@@ -121,7 +125,7 @@ def main():
     print("Cleaning complete.")
     print("Starting BERTopic...")
     dates = anthropocene_data["datePublished"].astype(str).tolist()
-    categories = anthropocene_data["TDMCategory"].astype(str).tolist()
+    categories = anthropocene_data["tdmCategory"].astype(str).tolist()
     topic_model = train_bertopic(cleaned_texts, dates, categories)
     topic_model.save("my_model")
     print("BERTopic training complete.")
