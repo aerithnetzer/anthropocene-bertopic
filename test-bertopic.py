@@ -2,7 +2,7 @@ import boto3
 from bertopic import BERTopic
 from tqdm import tqdm
 import json
-from cudf import pd
+import cudf as pd
 
 
 def load_first_jsonl_from_s3(
