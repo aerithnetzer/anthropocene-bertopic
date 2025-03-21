@@ -32,7 +32,7 @@ def load_first_jsonl_from_s3(
     # Create empty DataFrame - use pandas instead of cuDF for initial loading
     anthropocene_dataframe = pd.DataFrame()
 
-    for response in tqdm(response_iterator, desc="Loading JSONL files"):
+    for response in response_iterator:
         if "Contents" in response:
             for obj in response["Contents"]:
                 if obj["Key"].endswith(".jsonl"):
