@@ -182,7 +182,9 @@ def main():
     topic_model.visualize_documents(texts, sample=0.05).write_html("./documents.html")
     topic_model.visualize_hierarchy().write_html("./hierarchy.html")
     topic_model.visualize_heatmap().write_html("./heatmap.html")
-    topics_over_time = topic_model.topics_over_time(docs=texts, timestamps=dates)
+    topics_over_time = topic_model.topics_over_time(
+        docs=texts, timestamps=dates, nr_bins=100
+    )
     topics_over_time.visualize().write_html("./topics_over_time.html")
     topics_cats = topic_model.topics_per_class(docs=texts, classes=categories)
     topics_cats.visualize().write_html("./topics_per_class.html")
