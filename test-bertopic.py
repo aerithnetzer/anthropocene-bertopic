@@ -36,3 +36,6 @@ def load_first_jsonl_from_s3(
 
 def main():
     load_first_jsonl_from_s3()
+
+
+main()
