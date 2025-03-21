@@ -1,4 +1,5 @@
 import torch
+from tqdm import tqdm
 import time
 import numpy as np
 from bertopic import BERTopic
@@ -52,7 +53,9 @@ def clean_text(text: str) -> str:
 
     # Remove stopwords
     stop_words = set(stopwords.words("english"))
-    tokens = [token for token in tokens if token not in stop_words and len(token) > 2]
+    tokens = [
+        token for token in tqdm(tokens) if token not in stop_words and len(token) > 2
+    ]
 
     # Rejoin tokens
     return " ".join(tokens)
