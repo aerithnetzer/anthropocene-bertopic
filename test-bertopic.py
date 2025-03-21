@@ -80,9 +80,6 @@ def load_first_jsonl_from_s3(
                     else:
                         print(f"Warning: Required columns not found in {obj['Key']}")
 
-                    # Only process the first JSONL file for now
-                    break
-
     return anthropocene_dataframe
 
 
