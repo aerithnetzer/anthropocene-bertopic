@@ -40,6 +40,7 @@ def load_first_jsonl_from_s3(
                     jsonl_content = obj_response["Body"].read().decode("utf-8")
                     df = pd.read_json(jsonl_content, lines=True)
                     df = df[["datePublished", "tdmCategory", "fullText"]]
+                    print(df.columns)
                     pd.concat([anthropocene_dataframe, df], ignore_index=True)
                     break
     return anthropocene_dataframe
