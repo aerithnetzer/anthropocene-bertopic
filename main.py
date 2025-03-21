@@ -22,7 +22,9 @@ def main():
     hdbscan_model = HDBSCAN(min_cluster_size=5, min_samples=1, prediction_data=True)
 
     # Initialize BERTopic with CUDA-accelerated components
-    topic_model = BERTopic(umap_model=umap_model, hdbscan_model=hdbscan_model)
+    topic_model = BERTopic(
+        verbose=True, umap_model=umap_model, hdbscan_model=hdbscan_model
+    )
 
     # Fit the model on documents
     topics, probs = topic_model.fit_transform(docs)
