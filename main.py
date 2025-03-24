@@ -142,6 +142,7 @@ def main():
     hdbscan_model = HDBSCAN(min_cluster_size=15, min_samples=1, prediction_data=True)
     embeddings = embedding_model.encode(documents, show_progress_bar=True)
     embeddings = normalize(embeddings)
+    reduced_embeddings = umap_model.fit_transform(embeddings)
     topic_model = BERTopic(
         umap_model=umap_model,
         hdbscan_model=hdbscan_model,
@@ -152,9 +153,12 @@ def main():
 
     topic_model.save("topic_model-batch-1")
 
-    topic_model.visualize_documents(docs=documents, sample=0.05).write_html(
-        "documents-batch-1.html"
-    )
+    topic_model.visualize_documents(
+        docs=documents,
+        sample=0.05,
+        embeddings=embeddings,
+        reduced_embeddings=reduced_embeddings,
+    ).write_html("documents-batch-1.html")
     topic_model.visualize_topics().write_html("topics-batch-1.html")
     topic_model.visualize_hierarchy().write_html("hierarchy-batch-1.html")
     topic_model.visualize_heatmap().write_html("heatmap-batch-1.html")
