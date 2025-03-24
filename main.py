@@ -101,7 +101,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/batch-1"):
         if "Contents" not in page:
             continue
 
-        for obj in page["Contents"]:
+        for obj in page["Contents"][:1]:
             key = obj["Key"]
             if key.endswith(".jsonl"):
                 print(f"Processing: {key}")
