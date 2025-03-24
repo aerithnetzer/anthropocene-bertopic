@@ -110,13 +110,15 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/batch-1"):
                 this_df = pd.read_json(content, lines=True)
                 print(this_df["fullText"].head())
                 for index, row in this_df.iterrows():
-                    for part in this_df["fullText"]:
-                        if len(part) > 0:
-                            print(type(part))
-                            documents.append(part)
-                            categories.append(this_df["tdmCategory"][index])
-                            dates.append(this_df["datePublished"][index])
-                    break
+                    text = str(this_df["fullText"][index])
+                    # Split text into chunks of 100 words
+                    print(type(text))
+                    text = text.split()
+                    text = " ".join(text[:100])
+                    text = text.replace("\n", " ")
+                    documents.append(text)
+                    categories.append(this_df["tdmCategory"][index])
+                    dates.append(this_df["datePublished"][index])
     return documents, dates, categories
 
 
