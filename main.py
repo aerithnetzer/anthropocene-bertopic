@@ -78,8 +78,8 @@ def clean_texts_parallel(texts: List[str], max_workers: int = 4) -> List[str]:
     return cleaned_texts
 
 
-def load_first_jsonl_from_s3(
-    bucket_name: str, prefix: str = "constellate/batch-1", first_file_test: str = None
+def load_jsonl_from_s3(
+    bucket_name: str, prefix: str = "constellate/batch-1", first_file_test: bool = False
 ):
     """Loads data from the first JSONL file found in an S3 bucket with the given prefix.
 
@@ -131,7 +131,9 @@ def main():
     prefix = "constellate/batch-1"
 
     # Load documents from S3
-    documents, dates, categories = load_jsonl_from_s3(bucket_name, prefix)
+    documents, dates, categories = load_jsonl_from_s3(
+        bucket_name, prefix, first_file_test=True
+    )
 
     # Clean the data
     print("Cleaning data...")
