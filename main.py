@@ -101,7 +101,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/batch-1"):
         if "Contents" not in page:
             continue
 
-        for obj in page["Contents"]:
+        for obj in [page["Contents"][0]]:
             key = obj["Key"]
             if key.endswith(".jsonl"):
                 print(f"Processing: {key}")
@@ -110,9 +110,11 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/batch-1"):
                 this_df = pd.read_json(content, lines=True)
                 print(this_df["fullText"].head())
                 for index, row in this_df.iterrows():
-                    documents.append(this_df["fullText"][index])
-                    categories.append(this_df["tdmCategory"][index])
-                    dates.append(this_df["datePublished"][index])
+                    for part in this_df["fullText"]:
+                        if len(part) > 0:
+                            documents.append(part)
+                            categories.append(this_df["tdmCategory"][index])
+                            dates.append(this_df["datePublished"][index])
     return documents, dates, categories
 
 
