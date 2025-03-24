@@ -107,6 +107,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/") -> pd.Dat
                 response = s3_client.get_object(Bucket=bucket_name, Key=key)
                 content = response["Body"].read().decode("utf-8")
                 this_df = pd.read_json(content, lines=True)
+                print(this_df.head())
                 this_df = this_df[["fullText", "tdmCategory", "datePublished"]]
                 this_df = this_df.dropna()
                 pd.concat([df, this_df], ignore_index=True)
@@ -157,7 +158,7 @@ def main():
 
     # Fit the model with class information
     docs = df["fullText"].tolist()
-    
+
     topic_model = topic_model.fit(docs)
     # Get the classes from the DataFrame
     categories = df["TDMCategory"].tolist()
@@ -177,10 +178,10 @@ def main():
             print(f"Topic {topic_data[0]}: {topic_data[1]}")
     topic_model.visualize_documents(docs).write_html("visualize_documents.html")
     topics_per_class = topic_model.topics_per_class(docs, categories)
-     = topic_model.topics_over_time(docs, dates)
+    meow = topic_model.topics_over_time(docs, dates)
 
     #     # Save the visualization
-     topics_over_time.visualize_to .write_html("topics_over_time.html")
+    topics_over_time.visualize_to.write_html("topics_over_time.html")
     # Optional: Save results
     topic_model.save("topic_model")
 
