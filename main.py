@@ -78,7 +78,7 @@ def clean_texts_parallel(texts: List[str], max_workers: int = 4) -> List[str]:
     return cleaned_texts
 
 
-def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/") -> pd.DataFrame:
+def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
     """Recursively loads all JSONL files from an S3 bucket with the given prefix and returns a DataFrame.
 
     Args:
@@ -94,8 +94,9 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/") -> pd.Dat
     # List all objects with the given prefix
     paginator = s3_client.get_paginator("list_objects_v2")
     pages = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
-
-    df = pd.DataFrame(columns=["fullText", "TDMCategory", "datePublished"])
+    documents = []
+    dates = []
+    categories = []
     for page in pages:
         if "Contents" not in page:
             continue
@@ -108,12 +109,11 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/") -> pd.Dat
                 content = response["Body"].read().decode("utf-8")
                 this_df = pd.read_json(content, lines=True)
                 print(this_df["fullText"].head())
-                this_df = this_df[["fullText", "tdmCategory", "datePublished"]]
-                pd.concat([df, this_df], ignore_index=True)
-                break
-
-    df.to_csv("constellate.csv", index=False)
-    return df
+                for index, row in this_df.iterrows():
+                    documents.append(this_df["fullText"][index])
+                    categories.append(this_df["TDMCategory"][index])
+                    dates.append(this_df["datePublished"][index])
+    return documents, dates, categories
 
 
 def main():
@@ -122,15 +122,11 @@ def main():
     prefix = "constellate/"
 
     # Load documents from S3
-    df = load_jsonl_from_s3(bucket_name, prefix)
+    documents, dates, categories = load_jsonl_from_s3(bucket_name, prefix)
 
     # Clean the data
     print("Cleaning data...")
-    df["fullText"] = df["fullText"].astype(str)
-    df["fullText"] = df["fullText"].apply(clean_text)
-    df["fullText"] = df["fullText"].astype(str)
-    docs = df["fullText"].tolist()
-    print(docs)
+    documents = clean_texts_parallel(documents)
     # Configure UMAP for dimensionality reduction
     # umap_model = UMAP(
     #     n_components=5, n_neighbors=15, min_dist=0.0, metric="cosine", random_state=42
@@ -157,33 +153,10 @@ def main():
         language="english",
     )
 
-    # Fit the model with class information
-    docs = df["fullText"].tolist()
-
-    topic_model = topic_model.fit(docs)
+    topic_model = topic_model.fit_transform(documents)
     # Get the classes from the DataFrame
-    categories = df["TDMCategory"].tolist()
-    # Get the dates from the DataFrame
-    dates = df["datePublished"].tolist()
-    # Get topic information
     print("\nTopic model info:")
 
-    # Get class-topic mappings
-    class_topic_mapping = topic_model.topics_per_class(docs, categories)
-    class_date_mapping = topic_model.topics_per_class(docs, dates)
-
-    print("\nClass-topic mapping:")
-    for class_name, topics_data in class_topic_mapping.items():
-        print(f"\nClass: {class_name}")
-        for topic_data in topics_data[:3]:  # Show top 3 topics per class
-            print(f"Topic {topic_data[0]}: {topic_data[1]}")
-    topic_model.visualize_documents(docs).write_html("visualize_documents.html")
-    topics_per_class = topic_model.topics_per_class(docs, categories)
-    meow = topic_model.topics_over_time(docs, dates)
-
-    #     # Save the visualization
-    topics_over_time.visualize_to.write_html("topics_over_time.html")
-    # Optional: Save results
     topic_model.save("topic_model")
 
 
