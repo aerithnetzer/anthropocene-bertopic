@@ -109,9 +109,10 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/") -> pd.Dat
                 this_df = pd.read_json(content, lines=True)
                 print(this_df["fullText"].head())
                 this_df = this_df[["fullText", "tdmCategory", "datePublished"]]
-                this_df = this_df.dropna()
                 pd.concat([df, this_df], ignore_index=True)
                 break
+
+    df.to_csv("constellate.csv", index=False)
     return df
 
 
