@@ -78,51 +78,46 @@ def clean_texts_parallel(texts: List[str], max_workers: int = 4) -> List[str]:
     return cleaned_texts
 
 
-def load_jsonl_from_s3(
-    bucket_name: str, prefix: str = "constellate/batch-1", first_file_test: bool = False
-):
-    """Loads data from the first JSONL file found in an S3 bucket with the given prefix.
+def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/batch-1"):
+    """Recursively loads all JSONL files from an S3 bucket with the given prefix and returns a DataFrame.
 
     Args:
         bucket_name: The name of the S3 bucket
-        prefix: The prefix to filter objects by (default: "constellate/batch-1")
-        first_file_test: An optional argument to specify a test file to process instead of finding the first file.
+        prefix: The prefix to filter objects by (default: "constellate/")
 
     Returns:
-        Lists containing fullText, TDMCategory, and datePublished from the selected JSONL file.
+        A DataFrame containing the data from the first JSONL file with columns: fullText, TDMCategory, and datePublished
     """
     s3_client = boto3.client("s3")
+    documents = []
 
-    if first_file_test:
-        first_file = first_file_test
-    else:
-        paginator = s3_client.get_paginator("list_objects_v2")
-        pages = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
-        first_file = None
+    # List all objects with the given prefix
+    paginator = s3_client.get_paginator("list_objects_v2")
+    pages = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
+    documents = []
+    dates = []
+    categories = []
+    for page in pages:
+        if "Contents" not in page:
+            continue
 
-        for page in pages:
-            if "Contents" in page:
-                for obj in page["Contents"]:
-                    if obj["Key"].endswith(".jsonl"):
-                        first_file = obj["Key"]
-                        break
-            if first_file:
-                break
-
-    if not first_file:
-        return [], [], []  # Return empty lists if no JSONL file is found
-
-    print(f"Processing JSONL file: {first_file}")
-    response = s3_client.get_object(Bucket=bucket_name, Key=first_file)
-    content = response["Body"].read().decode("utf-8")
-
-    this_df = pd.read_json(content, lines=True)
-
-    documents = this_df["fullText"].dropna().tolist()
-    categories = this_df["tdmCategory"].dropna().tolist()
-    dates = this_df["datePublished"].dropna().tolist()
-
-    return documents, categories, dates
+        for obj in page["Contents"]:
+            key = obj["Key"]
+            if key.endswith(".jsonl"):
+                print(f"Processing: {key}")
+                response = s3_client.get_object(Bucket=bucket_name, Key=key)
+                content = response["Body"].read().decode("utf-8")
+                this_df = pd.read_json(content, lines=True)
+                print(this_df["fullText"].head())
+                for index, row in this_df.iterrows():
+                    for part in this_df["fullText"]:
+                        if len(part) > 0:
+                            print(type(part))
+                            documents.append(part)
+                            categories.append(this_df["tdmCategory"][index])
+                            dates.append(this_df["datePublished"][index])
+                    break
+    return documents, dates, categories
 
 
 def main():
@@ -131,9 +126,7 @@ def main():
     prefix = "constellate/batch-1"
 
     # Load documents from S3
-    documents, dates, categories = load_jsonl_from_s3(
-        bucket_name, prefix, first_file_test=True
-    )
+    documents, dates, categories = load_jsonl_from_s3(bucket_name, prefix)
 
     # Clean the data
     print("Cleaning data...")
