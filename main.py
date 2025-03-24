@@ -111,7 +111,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
                 print(this_df["fullText"].head())
                 for index, row in this_df.iterrows():
                     documents.append(this_df["fullText"][index])
-                    categories.append(this_df["TDMCategory"][index])
+                    categories.append(this_df["tdmCategory"][index])
                     dates.append(this_df["datePublished"][index])
     return documents, dates, categories
 
