@@ -14,6 +14,9 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing
+from cuml.cluster import HDBSCAN
+from cuml.manifold import UMAP
+from cuml.preprocessing import normalize
 
 print("Modules loaded")
 
@@ -134,36 +137,37 @@ def main():
     print("Cleaning data...")
     documents = clean_texts_parallel(documents)
     # Configure UMAP for dimensionality reduction
-    # umap_model = UMAP(
-    #     n_components=5, n_neighbors=15, min_dist=0.0, metric="cosine", random_state=42
-    # )
-    #
-    # # Configure HDBSCAN for clustering
-    # hdbscan_model = HDBSCAN(min_cluster_size=5, min_samples=1, prediction_data=True)
 
-    # Configure CountVectorizer for topic representation
-
-    # Initialize representation model for better topic representations
-
-    # Initialize BERTopic with components and class labels
-    # topic_model = BERTopic(
-    #     embedding_model=embedding_model,
-    #     umap_model=umap_model,
-    #     hdbscan_model=hdbscan_model,
-    #     verbose=True,
-    # )
+    umap_model = UMAP(n_components=5, n_neighbors=15, min_dist=0.0, random_state=42)
+    hdbscan_model = HDBSCAN(min_cluster_size=15, min_samples=1, prediction_data=True)
+    embeddings = embedding_model.encode(documents, show_progress_bar=True)
+    embeddings = normalize(embeddings)
     topic_model = BERTopic(
-        embedding_model=embedding_model,
+        umap_model=umap_model,
+        hdbscan_model=hdbscan_model,
         verbose=True,
-        calculate_probabilities=True,
-        language="english",
     )
 
-    topic_model = topic_model.fit_transform(documents)
-    # Get the classes from the DataFrame
-    print("\nTopic model info:")
+    topic_model = topic_model.fit(documents, embeddings)
 
-    topic_model.save("topic_model")
+    topic_model.save("topic_model-batch-1")
+
+    topic_model.visualize_documents(docs=documents, sample=0.05).write_html(
+        "documents-batch-1.html"
+    )
+    topic_model.visualize_topics().write_html("topics-batch-1.html")
+    topic_model.visualize_hierarchy().write_html("hierarchy-batch-1.html")
+    topic_model.visualize_heatmap().write_html("heatmap-batch-1.html")
+    topic_model.visualize_barchart().write_html("barchart-batch-1.html")
+
+    topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
+    topics_over_time.visualize_topics_over_time().write_html(
+        "topics_over_time-batch-1.html"
+    )
+    topics_per_category = topic_model.topics_per_class(documents, categories)
+    topics_per_category.visualize_topics_per_class().write_html(
+        "topics_per_category-batch-1.html"
+    )
 
 
 if __name__ == "__main__":
