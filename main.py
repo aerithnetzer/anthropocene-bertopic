@@ -149,11 +149,10 @@ def main():
         verbose=True,
     )
 
-    topic_model = topic_model.fit(
-        documents, embeddings, reduced_emeddings=reduced_embeddings
-    )
+    topic_model = topic_model.fit_transform(documents, embeddings)
 
     topic_model.save("topic_model_batch-2")
+
     with open("corpus.txt", "w") as f:
         for document in documents:
             f.write(f"{document}\n")
@@ -172,6 +171,7 @@ def main():
         embeddings=embeddings,
         reduced_embeddings=reduced_embeddings,
     ).write_html("documents_whole_batch.html")
+
     topic_model.visualize_topics().write_html("topics.html")
     topic_model.visualize_hierarchy().write_html("hierarchy.html")
     topic_model.visualize_heatmap().write_html("heatmap.html")
