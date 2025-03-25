@@ -17,7 +17,15 @@ import multiprocessing
 from cuml.cluster import HDBSCAN
 from cuml.manifold import UMAP
 from cuml.preprocessing import normalize
+import concurrent.futures
 
+# Precompile regex patterns
+PUNCTUATION_PATTERN = re.compile(f"[{re.escape(string.punctuation)}]")
+NUMBERS_PATTERN = re.compile(r"\d+")
+
+# Load stopwords and English words as frozensets for faster lookup
+STOP_WORDS = frozenset(stopwords.words("english"))
+ENGLISH_WORDS = frozenset(words.words())
 print("Modules loaded")
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -47,25 +55,19 @@ def clean_text(text: str) -> str:
     text = text.lower()
 
     # Remove punctuation and numbers
-    text = re.sub(r"[^\w\s]", " ", text)
-    text = re.sub(r"\d+", " ", text)
+    text = PUNCTUATION_PATTERN.sub(" ", text)
+    text = NUMBERS_PATTERN.sub(" ", text)
 
-    # Tokenize
+    # Tokenize and filter
     tokens = word_tokenize(text)
+    clean_tokens = [
+        token for token in tokens if token in ENGLISH_WORDS and token not in STOP_WORDS
+    ]
 
-    # Remove stopwords
-    stop_words = set(stopwords.words("english"))
-    english_words = set(words.words())
-    clean_tokens = []
-    for token in tokens:
-        if token not in stop_words and token in english_words:
-            clean_tokens.append(token)
-
-    # Rejoin tokens
     return " ".join(clean_tokens)
 
 
-def clean_texts_parallel(texts: List[str], max_workers: int = 4) -> List[str]:
+def clean_texts_parallel(texts: List[str], max_workers=None) -> List[str]:
     """
     Clean a list of texts in parallel.
 
@@ -85,48 +87,71 @@ def clean_texts_parallel(texts: List[str], max_workers: int = 4) -> List[str]:
     return cleaned_texts
 
 
+def fetch_jsonl(s3_client, bucket_name, key):
+    """Fetches a JSONL file from S3 and extracts relevant fields."""
+    response = s3_client.get_object(Bucket=bucket_name, Key=key)
+    content = response["Body"].read().decode("utf-8")
+    df = pd.read_json(content, lines=True)
+
+    # Extract relevant columns and preprocess
+    df["fullText"] = (
+        df["fullText"]
+        .astype(str)
+        .str.split()
+        .apply(lambda x: " ".join(x[:100]).replace("\n", " "))
+    )
+
+    return df[["fullText", "tdmCategory", "datePublished"]]
+
+
 def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/batch-3"):
-    """Recursively loads all JSONL files from an S3 bucket with the given prefix and returns a DataFrame.
+    """
+    Recursively loads all JSONL files from an S3 bucket with the given prefix and returns lists.
 
     Args:
         bucket_name: The name of the S3 bucket
-        prefix: The prefix to filter objects by (default: "constellate/")
+        prefix: The prefix to filter objects by (default: "constellate/batch-3")
 
     Returns:
-        A DataFrame containing the data from the first JSONL file with columns: fullText, TDMCategory, and datePublished
+        Lists containing fullText, TDMCategory, and datePublished values
     """
     s3_client = boto3.client("s3")
-    documents = []
 
-    # List all objects with the given prefix
+    # List all JSONL files with the given prefix
     paginator = s3_client.get_paginator("list_objects_v2")
     pages = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
-    documents = []
-    dates = []
-    categories = []
-    for page in pages:
-        if "Contents" not in page:
-            continue
 
-        for obj in page["Contents"]:
-            key = obj["Key"]
-            if key.endswith(".jsonl"):
-                print(f"Processing: {key}")
-                response = s3_client.get_object(Bucket=bucket_name, Key=key)
-                content = response["Body"].read().decode("utf-8")
-                this_df = pd.read_json(content, lines=True)
-                print(this_df["fullText"].head())
-                for index, row in this_df.iterrows():
-                    text = str(this_df["fullText"][index])
-                    # Split text into chunks of 100 words
-                    print(type(text))
-                    text = text.split()
-                    text = " ".join(text[:100])
-                    text = text.replace("\n", " ")
-                    documents.append(text)
-                    categories.append(this_df["tdmCategory"][index])
-                    dates.append(this_df["datePublished"][index])
-    return documents, dates, categories
+    jsonl_keys = [
+        obj["Key"]
+        for page in pages
+        if "Contents" in page
+        for obj in page["Contents"]
+        if obj["Key"].endswith(".jsonl")
+    ]
+
+    documents, categories, dates = [], [], []
+
+    # Load files in parallel
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = {
+            executor.submit(fetch_jsonl, s3_client, bucket_name, key): key
+            for key in jsonl_keys
+        }
+
+        for future in tqdm(
+            concurrent.futures.as_completed(futures),
+            total=len(futures),
+            desc="Processing files",
+        ):
+            try:
+                df = future.result()
+                documents.extend(df["fullText"].tolist())
+                categories.extend(df["tdmCategory"].tolist())
+                dates.extend(df["datePublished"].tolist())
+            except Exception as e:
+                print(f"Error processing {futures[future]}: {e}")
+
+    return documents, categories, dates
 
 
 def main():
@@ -139,14 +164,18 @@ def main():
 
     # Clean the data
     print("Cleaning data...")
-    documents = clean_texts_parallel(documents, max_workers=100)
-    # Configure UMAP for dimensionality reduction
+    documents = clean_texts_parallel(documents, max_workers=None)
 
     umap_model = UMAP(n_components=2, n_neighbors=15, min_dist=0.0, random_state=42)
+
     hdbscan_model = HDBSCAN(min_cluster_size=15, min_samples=1, prediction_data=True)
+
     embeddings = embedding_model.encode(documents, show_progress_bar=True)
+
     embeddings = normalize(embeddings)
+
     reduced_embeddings = umap_model.fit_transform(embeddings)
+
     topic_model = BERTopic(
         umap_model=umap_model,
         hdbscan_model=hdbscan_model,
