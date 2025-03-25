@@ -48,10 +48,9 @@ else
 fi
 
 # Create a Python virtual environment (optional)
-DEV_DIR="$HOME/dev_env"
-mkdir -p $DEV_DIR
-cd $DEV_DIR
-python3 -m venv venv
+python3 -m venv ~/venv
+
+git clone https://github.com/aerithnetzer/anthropocene-bertopic.git
 
 echo "Python 3.11 development setup complete!"
 echo "Activate your virtual environment with: source $DEV_DIR/venv/bin/activate"
