@@ -186,21 +186,9 @@ def main():
 
     topic_model.save("topic_model_whole_batch")
 
-    with open("corpus.txt", "w") as f:
-        for document in documents:
-            f.write(f"{document}\n")
-
-    with open("dates.txt", "w") as f:
-        for date in dates:
-            f.write(f"{date}\n")
-
-    with open("categories.txt", "w") as f:
-        for category in categories:
-            f.write(f"{category}\n")
-
     topic_model.visualize_documents(
         docs=documents,
-        sample=0.05,
+        sample=0.01,
         embeddings=embeddings,
         reduced_embeddings=reduced_embeddings,
     ).write_html("documents_whole_batch.html")
