@@ -139,7 +139,7 @@ def main():
 
     # Clean the data
     print("Cleaning data...")
-    documents = clean_texts_parallel(documents)
+    documents = clean_texts_parallel(documents, max_workers=100)
     # Configure UMAP for dimensionality reduction
 
     umap_model = UMAP(n_components=2, n_neighbors=15, min_dist=0.0, random_state=42)
