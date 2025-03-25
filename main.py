@@ -10,7 +10,7 @@ from typing import List, Dict, Any
 import re
 import string
 import nltk
-from nltk.corpus import stopwords
+from nltk.corpus import stopwords, words
 from nltk.tokenize import word_tokenize
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing
@@ -52,9 +52,13 @@ def clean_text(text: str) -> str:
 
     # Tokenize
     tokens = word_tokenize(text)
-
+    
     # Remove stopwords
     stop_words = set(stopwords.words("english"))
+    english_words = set(words.words())
+    clean_tokens = []
+    for token in tokens:
+        if token not in stop_words and token in english_words and if:
     tokens = [token for token in tokens if token not in stop_words and len(token) > 2]
 
     # Rejoin tokens
@@ -149,9 +153,9 @@ def main():
         verbose=True,
     )
 
-    topic_model = topic_model.fit_transform(documents, embeddings)
+    topic_model = topic_model.fit(documents, embeddings)
 
-    topic_model.save("topic_model_batch-2")
+    topic_model.save("topic_model_whole_batch")
 
     with open("corpus.txt", "w") as f:
         for document in documents:
