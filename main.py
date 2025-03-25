@@ -52,17 +52,17 @@ def clean_text(text: str) -> str:
 
     # Tokenize
     tokens = word_tokenize(text)
-    
+
     # Remove stopwords
     stop_words = set(stopwords.words("english"))
     english_words = set(words.words())
     clean_tokens = []
     for token in tokens:
-        if token not in stop_words and token in english_words and if:
-    tokens = [token for token in tokens if token not in stop_words and len(token) > 2]
+        if token not in stop_words and token in english_words:
+            clean_tokens.append(token)
 
     # Rejoin tokens
-    return " ".join(tokens)
+    return " ".join(clean_tokens)
 
 
 def clean_texts_parallel(texts: List[str], max_workers: int = 4) -> List[str]:
