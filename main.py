@@ -81,7 +81,7 @@ def clean_texts_parallel(texts: List[str], max_workers: int = 4) -> List[str]:
     return cleaned_texts
 
 
-def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/batch-1"):
+def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
     """Recursively loads all JSONL files from an S3 bucket with the given prefix and returns a DataFrame.
 
     Args:
@@ -128,7 +128,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/batch-1"):
 def main():
     # Configure S3 bucket information
     bucket_name = "anthropocene-data"  # Replace with your bucket name
-    prefix = "constellate/batch-1"
+    prefix = "constellate/"
 
     # Load documents from S3
     documents, dates, categories = load_jsonl_from_s3(bucket_name, prefix)
@@ -138,7 +138,7 @@ def main():
     documents = clean_texts_parallel(documents)
     # Configure UMAP for dimensionality reduction
 
-    umap_model = UMAP(n_components=5, n_neighbors=15, min_dist=0.0, random_state=42)
+    umap_model = UMAP(n_components=2, n_neighbors=15, min_dist=0.0, random_state=42)
     hdbscan_model = HDBSCAN(min_cluster_size=15, min_samples=1, prediction_data=True)
     embeddings = embedding_model.encode(documents, show_progress_bar=True)
     embeddings = normalize(embeddings)
@@ -149,9 +149,22 @@ def main():
         verbose=True,
     )
 
-    topic_model = topic_model.fit(documents, embeddings)
+    topic_model = topic_model.fit(
+        documents, embeddings, reduced_emeddings=reduced_embeddings
+    )
 
     topic_model.save("topic_model-batch-1")
+    with open("corpus.txt", "w") as f:
+        for document in documents:
+            f.write(f"{document}\n")
+
+    with open("dates.txt", "w") as f:
+        for date in dates:
+            f.write(f"{date}\n")
+
+    with open("categories.txt", "w") as f:
+        for category in categories:
+            f.write(f"{category}\n")
 
     topic_model.visualize_documents(
         docs=documents,
