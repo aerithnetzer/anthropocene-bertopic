@@ -171,19 +171,17 @@ def main():
         sample=0.05,
         embeddings=embeddings,
         reduced_embeddings=reduced_embeddings,
-    ).write_html("documents-batch-1.html")
-    topic_model.visualize_topics().write_html("topics-batch-1.html")
-    topic_model.visualize_hierarchy().write_html("hierarchy-batch-1.html")
-    topic_model.visualize_heatmap().write_html("heatmap-batch-1.html")
-    topic_model.visualize_barchart().write_html("barchart-batch-1.html")
+    ).write_html("documents_whole_batch.html")
+    topic_model.visualize_topics().write_html("topics.html")
+    topic_model.visualize_hierarchy().write_html("hierarchy.html")
+    topic_model.visualize_heatmap().write_html("heatmap.html")
+    topic_model.visualize_barchart().write_html("barchart.html")
 
     topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
-    topics_over_time.visualize_topics_over_time().write_html(
-        "topics_over_time-batch-1.html"
-    )
+    topics_over_time.visualize_topics_over_time().write_html("topics_over_time.html")
     topics_per_category = topic_model.topics_per_class(documents, categories)
     topics_per_category.visualize_topics_per_class().write_html(
-        "topics_per_category-batch-1.html"
+        "topics_per_category.html"
     )
 
 
