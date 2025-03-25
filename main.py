@@ -81,7 +81,7 @@ def clean_texts_parallel(texts: List[str], max_workers: int = 4) -> List[str]:
     return cleaned_texts
 
 
-def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
+def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/batch-2"):
     """Recursively loads all JSONL files from an S3 bucket with the given prefix and returns a DataFrame.
 
     Args:
@@ -128,7 +128,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
 def main():
     # Configure S3 bucket information
     bucket_name = "anthropocene-data"  # Replace with your bucket name
-    prefix = "constellate/"
+    prefix = "constellate/batch-2"
 
     # Load documents from S3
     documents, dates, categories = load_jsonl_from_s3(bucket_name, prefix)
@@ -153,7 +153,7 @@ def main():
         documents, embeddings, reduced_emeddings=reduced_embeddings
     )
 
-    topic_model.save("topic_model-batch-1")
+    topic_model.save("topic_model_batch-2")
     with open("corpus.txt", "w") as f:
         for document in documents:
             f.write(f"{document}\n")
