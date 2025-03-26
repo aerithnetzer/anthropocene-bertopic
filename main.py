@@ -166,9 +166,13 @@ def main(batch_number: int = 0):
     print("Cleaning data...")
     documents = clean_texts_parallel(documents, max_workers=None)
 
-    umap_model = UMAP(n_components=2, n_neighbors=15, min_dist=0.0, random_state=42)
+    umap_model = UMAP(
+        n_components=2, n_neighbors=15, min_dist=0.0, random_state=42, verbose=True
+    )
 
-    hdbscan_model = HDBSCAN(min_cluster_size=15, min_samples=1, prediction_data=True)
+    hdbscan_model = HDBSCAN(
+        min_cluster_size=15, min_samples=1, prediction_data=True, verbose=True
+    )
 
     embeddings = embedding_model.encode(documents, show_progress_bar=True)
 
@@ -220,4 +224,4 @@ def main(batch_number: int = 0):
 
 
 if __name__ == "__main__":
-    main(batch_number=1)
+    main(batch_number=3)
