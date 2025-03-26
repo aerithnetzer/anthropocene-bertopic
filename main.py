@@ -224,4 +224,4 @@ def main(batch_number: int = 0):
 
 
 if __name__ == "__main__":
-    main(batch_number=3)
+    main(batch_number=2)
