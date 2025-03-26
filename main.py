@@ -185,10 +185,21 @@ def main(batch_number: int = 0):
     topic_model = topic_model.fit(documents, embeddings)
 
     topic_model.save(f"topic_model_batch_{batch_number}")
+    with open(f"corpus-{batch_number}.txt", "w") as f:
+        for document in documents:
+            f.write(str(document) + "\n")
+
+    with open(f"categories-{batch_number}.txt", "w") as f:
+        for category in categories:
+            f.write(str(category) + "\n")
+
+    with open(f"dates-{batch_number}.txt", "w") as f:
+        for date in dates:
+            f.write(str(date) + "\n")
 
     topic_model.visualize_documents(
         docs=documents,
-        sample=0.01,
+        sample=0.05,
         embeddings=embeddings,
         reduced_embeddings=reduced_embeddings,
     ).write_html(f"documents_batch-{batch_number}.html")
