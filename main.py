@@ -157,7 +157,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
 def main(batch_number: int = 0):
     # Configure S3 bucket information
     bucket_name = "anthropocene-data"  # Replace with your bucket name
-    prefix = f"constellate/batch-{batch_number}"
+    prefix = f"constellate/batch-{batch_number}/"
 
     # Load documents from S3
     documents, dates, categories = load_jsonl_from_s3(bucket_name, prefix)
