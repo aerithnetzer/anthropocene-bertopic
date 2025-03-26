@@ -154,10 +154,10 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
     return documents, categories, dates
 
 
-def main():
+def main(batch_number: int = 0):
     # Configure S3 bucket information
     bucket_name = "anthropocene-data"  # Replace with your bucket name
-    prefix = "constellate/"
+    prefix = f"constellate/batch-{batch_number}"
 
     # Load documents from S3
     documents, dates, categories = load_jsonl_from_s3(bucket_name, prefix)
@@ -184,27 +184,29 @@ def main():
 
     topic_model = topic_model.fit(documents, embeddings)
 
-    topic_model.save("topic_model_whole_batch")
+    topic_model.save(f"topic_model_batch_{batch_number}")
 
     topic_model.visualize_documents(
         docs=documents,
         sample=0.01,
         embeddings=embeddings,
         reduced_embeddings=reduced_embeddings,
-    ).write_html("documents_whole_batch.html")
+    ).write_html(f"documents_batch-{batch_number}.html")
 
-    topic_model.visualize_topics().write_html("topics.html")
-    topic_model.visualize_hierarchy().write_html("hierarchy.html")
-    topic_model.visualize_heatmap().write_html("heatmap.html")
-    topic_model.visualize_barchart().write_html("barchart.html")
+    topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
+    topic_model.visualize_hierarchy().write_html(f"hierarchy-{batch_number}.html")
+    topic_model.visualize_heatmap().write_html(f"heatmap-{batch_number}.html")
+    topic_model.visualize_barchart().write_html(f"barchart-{batch_number}.html")
 
     topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
-    topics_over_time.visualize_topics_over_time().write_html("topics_over_time.html")
+    topics_over_time.visualize_topics_over_time().write_html(
+        f"topics_over_time-batch{batch_number}.html"
+    )
     topics_per_category = topic_model.topics_per_class(documents, categories)
     topics_per_category.visualize_topics_per_class().write_html(
-        "topics_per_category.html"
+        f"topics_per_category{batch_number}.html"
     )
 
 
 if __name__ == "__main__":
-    main()
+    main(batch_number=1)
