@@ -177,16 +177,30 @@ def main():
     with open("categories.txt", "w") as f:
         for category in categories:
             f.write(category + "\n")
-
+    print("Visualizing topics")
     topic_model.visualize_topics().write_html("./topics.html")
+
+    print("Visualizing documents")
     topic_model.visualize_documents(texts, sample=0.05).write_html("./documents.html")
+
+    print("Visualizing hierarchy")
     topic_model.visualize_hierarchy().write_html("./hierarchy.html")
+
+    print("Visualizing heatmap")
     topic_model.visualize_heatmap().write_html("./heatmap.html")
+
+    print("Calculating topics over time")
     topics_over_time = topic_model.topics_over_time(
         docs=texts, timestamps=dates, nr_bins=100
     )
+
+    print("Visualizing topics over time")
     topics_over_time.visualize().write_html("./topics_over_time.html")
+
+    print("Calculating topics per class")
     topics_cats = topic_model.topics_per_class(docs=texts, classes=categories)
+
+    print("Visualizing topics per class")
     topics_cats.visualize().write_html("./topics_per_class.html")
 
 
