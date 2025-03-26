@@ -201,26 +201,26 @@ def main(batch_number: int = 0):
         for date in tqdm(dates, desc="Writing dates"):
             f.write(str(date) + "\n")
 
-    topic_model.visualize_documents(
-        docs=documents,
-        sample=0.05,
-        embeddings=embeddings,
-        reduced_embeddings=reduced_embeddings,
-    ).write_html(f"documents_batch-{batch_number}.html")
-
-    topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
-    topic_model.visualize_hierarchy().write_html(f"hierarchy-{batch_number}.html")
-    topic_model.visualize_heatmap().write_html(f"heatmap-{batch_number}.html")
-    topic_model.visualize_barchart().write_html(f"barchart-{batch_number}.html")
-
-    topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
-    topics_over_time.visualize_topics_over_time().write_html(
-        f"topics_over_time-batch{batch_number}.html"
-    )
-    topics_per_category = topic_model.topics_per_class(documents, categories)
-    topics_per_category.visualize_topics_per_class().write_html(
-        f"topics_per_category{batch_number}.html"
-    )
+    # topic_model.visualize_documents(
+    #     docs=documents,
+    #     sample=0.05,
+    #     embeddings=embeddings,
+    #     reduced_embeddings=reduced_embeddings,
+    # ).write_html(f"documents_batch-{batch_number}.html")
+    #
+    # topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
+    # topic_model.visualize_hierarchy().write_html(f"hierarchy-{batch_number}.html")
+    # topic_model.visualize_heatmap().write_html(f"heatmap-{batch_number}.html")
+    # topic_model.visualize_barchart().write_html(f"barchart-{batch_number}.html")
+    #
+    # topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
+    # topics_over_time.visualize_topics_over_time().write_html(
+    #     f"topics_over_time-batch{batch_number}.html"
+    # )
+    # topics_per_category = topic_model.topics_per_class(documents, categories)
+    # topics_per_category.visualize_topics_per_class().write_html(
+    #     f"topics_per_category{batch_number}.html"
+    # )
 
 
 if __name__ == "__main__":
