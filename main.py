@@ -145,6 +145,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
         ):
             try:
                 df = future.result()
+                print(df.columns)
                 titles.extend(df["title"].tolist())
                 documents.extend(df["fullText"].tolist())
                 categories.extend(df["tdmCategory"].tolist())
@@ -152,7 +153,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
             except Exception as e:
                 print(f"Error processing {futures[future]}: {e}")
 
-    return documents, categories, dates
+    return documents, categories, dates, titles
 
 
 def main(batch_number: int = 0):
@@ -161,7 +162,7 @@ def main(batch_number: int = 0):
     prefix = f"constellate/batch-{batch_number}/"
 
     # Load documents from S3
-    documents, dates, categories = load_jsonl_from_s3(bucket_name, prefix)
+    documents, dates, categories, titles = load_jsonl_from_s3(bucket_name, prefix)
 
     # Clean the data
     print("Cleaning data...")
@@ -190,6 +191,11 @@ def main(batch_number: int = 0):
     topic_model = topic_model.fit(documents, embeddings)
 
     topic_model.save(f"topic_model_batch_{batch_number}")
+
+    with open(f"titles-{batch_number}.txt", "w") as f:
+        for title in tqdm(titles, desc="Writing titles"):
+            f.write(str(title) + "\n")
+
     with open(f"corpus-{batch_number}.txt", "w") as f:
         for document in tqdm(documents, desc="Writing corpora"):
             f.write(str(document) + "\n")
