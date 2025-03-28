@@ -5,6 +5,10 @@ build/
 dist/
 wheels/
 *.egg-info
-
+*.txt
+*.html
+*.model
+tensorboard_logs/*
+word2vec_outputs/*
 # Virtual environments
 .venv

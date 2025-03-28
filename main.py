@@ -129,7 +129,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
         if obj["Key"].endswith(".jsonl")
     ]
 
-    documents, categories, dates = [], [], []
+    documents, categories, dates, titles = [], [], [], []
 
     # Load files in parallel
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -145,6 +145,7 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
         ):
             try:
                 df = future.result()
+                titles.extend(df["title"].tolist())
                 documents.extend(df["fullText"].tolist())
                 categories.extend(df["tdmCategory"].tolist())
                 dates.extend(df["datePublished"].tolist())
