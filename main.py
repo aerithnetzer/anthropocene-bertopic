@@ -101,7 +101,7 @@ def fetch_jsonl(s3_client, bucket_name, key):
         .apply(lambda x: " ".join(x[:100]).replace("\n", " "))
     )
 
-    return df[["fullText", "tdmCategory", "datePublished"]]
+    return df[["title", "fullText", "tdmCategory", "datePublished"]]
 
 
 def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
