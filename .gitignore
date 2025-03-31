@@ -12,3 +12,4 @@ tensorboard_logs/*
 word2vec_outputs/*
 # Virtual environments
 .venv
+.DS_Store
