@@ -192,19 +192,19 @@ def main(batch_number: int = 0):
 
     topic_model.save(f"topic_model_batch_{batch_number}")
 
-    with open(f"titles-{batch_number}.txt", "w") as f:
+    with open(f"titles-{batch_number}.txt", "w", encoding="utf-8") as f:
         for title in tqdm(titles, desc="Writing titles"):
             f.write(str(title) + "\n")
 
-    with open(f"corpus-{batch_number}.txt", "w") as f:
+    with open(f"corpus-{batch_number}.txt", "w", encoding="utf-8") as f:
         for document in tqdm(documents, desc="Writing corpora"):
             f.write(str(document) + "\n")
 
-    with open(f"categories-{batch_number}.txt", "w") as f:
+    with open(f"categories-{batch_number}.txt", "w", encoding="utf-8") as f:
         for category in tqdm(categories, desc="Writing categories"):
             f.write(str(category) + "\n")
 
-    with open(f"dates-{batch_number}.txt", "w") as f:
+    with open(f"dates-{batch_number}.txt", "w", encoding="utf-8") as f:
         for date in tqdm(dates, desc="Writing dates"):
             f.write(str(date) + "\n")
 
