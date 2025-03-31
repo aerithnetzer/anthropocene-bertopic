@@ -49,6 +49,8 @@ topic_model = BERTopic(
     verbose=True,
 )
 
+topic_model = topic_model.fit(corpus, embeddings)
+
 print("visualizing documents")
 topic_model.visualize_documents(
     docs=corpus,
