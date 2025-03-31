@@ -15,19 +15,22 @@ corpus_files = glob.glob("corpus-*.txt")
 
 for corpus_file in corpus_files:
     with open(corpus_file, "r") as f:
-        corpus.append(f.readlines())
+        for line in f.readlines():
+            corpus.append(str(line))
 
 dates_files = glob.glob("dates-*.txt")
 
 for dates_file in dates_files:
     with open(dates_file, "r") as f:
-        timestamps.append(f.readlines())
+        for line in f.readlines():
+            timestamps.append(str(line))
 
 categories_files = glob.glob("categories-*.txt")
 
 for categories_file in categories_files:
     with open(categories_file, "r") as f:
-        categories.append(f.readlines())
+        for line in f.readlines():
+            categories.append(str(line))
 
 umap_model = UMAP(
     n_components=2, n_neighbors=15, min_dist=0.0, random_state=42, verbose=True
