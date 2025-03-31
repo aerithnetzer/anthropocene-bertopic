@@ -50,7 +50,15 @@ fi
 # Create a Python virtual environment (optional)
 python3 -m venv ~/venv
 
+source venv/bin/activate
+
 git clone https://github.com/aerithnetzer/anthropocene-bertopic.git
+
+cd anthropocene-bertopic
+
+pip3 install -r requirements.txt
+
+aws s3 --recursive s3://anthropocene-data/constellate/ . --include "*.txt" --exclude "*"
 
 echo "Python 3.11 development setup complete!"
 echo "Activate your virtual environment with: source $DEV_DIR/venv/bin/activate"
