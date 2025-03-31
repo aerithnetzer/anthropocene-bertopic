@@ -168,29 +168,29 @@ def main(batch_number: int = 0):
     print("Cleaning data...")
     documents = clean_texts_parallel(documents, max_workers=None)
 
-    umap_model = UMAP(
-        n_components=2, n_neighbors=15, min_dist=0.0, random_state=42, verbose=True
-    )
+    # umap_model = UMAP(
+    #     n_components=2, n_neighbors=15, min_dist=0.0, random_state=42, verbose=True
+    # )
+    #
+    # hdbscan_model = HDBSCAN(
+    #     min_cluster_size=15, min_samples=1, prediction_data=True, verbose=True
+    # )
+    #
+    # embeddings = embedding_model.encode(documents, show_progress_bar=True)
+    #
+    # embeddings = normalize(embeddings)
+    #
+    # reduced_embeddings = umap_model.fit_transform(embeddings)
+    #
+    # topic_model = BERTopic(
+    #     umap_model=umap_model,
+    #     hdbscan_model=hdbscan_model,
+    #     verbose=True,
+    # )
 
-    hdbscan_model = HDBSCAN(
-        min_cluster_size=15, min_samples=1, prediction_data=True, verbose=True
-    )
-
-    embeddings = embedding_model.encode(documents, show_progress_bar=True)
-
-    embeddings = normalize(embeddings)
-
-    reduced_embeddings = umap_model.fit_transform(embeddings)
-
-    topic_model = BERTopic(
-        umap_model=umap_model,
-        hdbscan_model=hdbscan_model,
-        verbose=True,
-    )
-
-    topic_model = topic_model.fit(documents, embeddings)
-
-    topic_model.save(f"topic_model_batch_{batch_number}")
+    # topic_model = topic_model.fit(documents, embeddings)
+    #
+    # topic_model.save(f"topic_model_batch_{batch_number}")
 
     with open(f"titles-{batch_number}.txt", "w", encoding="utf-8") as f:
         for title in tqdm(titles, desc="Writing titles"):
@@ -208,48 +208,48 @@ def main(batch_number: int = 0):
         for date in tqdm(dates, desc="Writing dates"):
             f.write(str(date) + "\n")
 
-    print("visualizing documents")
-    topic_model.visualize_documents(
-        docs=documents,
-        sample=0.05,
-        embeddings=embeddings,
-        reduced_embeddings=reduced_embeddings,
-    ).write_html(f"documents_batch-{batch_number}.html")
-
-    print("visualizing topics")
-    topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
-
-    print("visualizing Hierarchy")
-    topic_model.visualize_hierarchy(top_n_topics=50).write_html(
-        f"hierarchy-{batch_number}.html"
-    )
-
-    print("Visualizing heatmap")
-    topic_model.visualize_heatmap(top_n_topics=50).write_html(
-        f"heatmap-{batch_number}.html"
-    )
-    print("Visualizing barchart")
-    topic_model.visualize_barchart(top_n_topics=50).write_html(
-        f"barchart-{batch_number}.html"
-    )
-
-    print("Calculating topics over time")
-    topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
-
-    print("Visualizing topics over time")
-    topics_over_time.visualize_topics_over_time(top_n_topics=50).write_html(
-        f"topics_over_time-batch{batch_number}.html"
-    )
-
-    print("Calculating Topics per category")
-
-    topics_per_category = topic_model.topics_per_class(documents, categories)
-
-    print("Visualizing Topics per category")
-    topics_per_category.visualize_topics_per_class().write_html(
-        f"topics_per_category{batch_number}.html"
-    )
+    # print("visualizing documents")
+    # topic_model.visualize_documents(
+    #     docs=documents,
+    #     sample=0.05,
+    #     embeddings=embeddings,
+    #     reduced_embeddings=reduced_embeddings,
+    # ).write_html(f"documents_batch-{batch_number}.html")
+    #
+    # print("visualizing topics")
+    # topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
+    #
+    # print("visualizing Hierarchy")
+    # topic_model.visualize_hierarchy(top_n_topics=50).write_html(
+    #     f"hierarchy-{batch_number}.html"
+    # )
+    #
+    # print("Visualizing heatmap")
+    # topic_model.visualize_heatmap(top_n_topics=50).write_html(
+    #     f"heatmap-{batch_number}.html"
+    # )
+    # print("Visualizing barchart")
+    # topic_model.visualize_barchart(top_n_topics=50).write_html(
+    #     f"barchart-{batch_number}.html"
+    # )
+    #
+    # print("Calculating topics over time")
+    # topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
+    #
+    # print("Visualizing topics over time")
+    # topics_over_time.visualize_topics_over_time(top_n_topics=50).write_html(
+    #     f"topics_over_time-batch{batch_number}.html"
+    # )
+    #
+    # print("Calculating Topics per category")
+    #
+    # topics_per_category = topic_model.topics_per_class(documents, categories)
+    #
+    # print("Visualizing Topics per category")
+    # topics_per_category.visualize_topics_per_class().write_html(
+    #     f"topics_per_category{batch_number}.html"
+    # )
 
 
 if __name__ == "__main__":
-    main(batch_number=2)
+    main(batch_number=1)
