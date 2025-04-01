@@ -167,13 +167,14 @@ def main(batch_number: int = 0):
     with open(f"corpus-{batch_number}.txt", "r") as f:
         documents = [line for line in f.readlines()]
 
-    dates = []
-    with open(f"dates-{batch_number}.txt", "r") as f:
-        dates = [line for line in f.readlines()]
-
     categories = []
-    with open(f"categories-{batch_number}.txt", "r") as f:
+    dates = []
+
+    with open(f"dates-{batch_number}.txt", "r") as f:
         categories = [line for line in f.readlines()]
+
+    with open(f"categories-{batch_number}.txt", "r") as f:
+        dates = [line for line in f.readlines()]
 
     # Clean the data
     # print("Cleaning data...")
