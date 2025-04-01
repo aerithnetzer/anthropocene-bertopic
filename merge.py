@@ -85,10 +85,13 @@ topic_model.visualize_topics(top_n_topics=20).write_html(f"topics-{batch_number}
 topics = list(range(1, 21))
 print("Visualizing topics over time")
 
-topics_over_time = topic_model.topics_over_time(
-    docs=documents, timestamps=dates, topics=topics, nr_bins=20
+print("Calculating topics over time")
+topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=50)
+
+print("Visualizing topics over time")
+topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=50).write_html(
+    f"topics_over_time-batch{batch_number}.html"
 )
-topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=20)
 
 print("visualizing Hierarchy")
 topic_model.visualize_hierarchy(top_n_topics=20).write_html(
