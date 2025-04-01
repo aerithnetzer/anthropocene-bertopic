@@ -172,6 +172,8 @@ def main(batch_number: int = 0):
         categories = [line.replace("\n", "") for line in f.readlines()]
         categories = [str(categories[1]) for category in categories]
 
+    print(categories[0])
+
     with open(f"categories-{batch_number}.txt", "r") as f:
         dates = [line for line in f.readlines()]
 
