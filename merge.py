@@ -77,9 +77,11 @@ print("Date: ", dates[0])
 print("Doc: ", documents[0])
 print("Category: ", categories[0])
 
-merged_model = BERTopic().merge_models(loaded_models)
+model = BERTopic().merge_models(loaded_models)
 
-topic_model = merged_model
+model.update_topics(documents)
+
+topic_model = model
 
 batch_number = "999"
 
