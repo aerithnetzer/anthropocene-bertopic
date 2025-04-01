@@ -221,14 +221,17 @@ def main(batch_number: int = 0):
     #     for date in tqdm(dates, desc="Writing dates"):
     #         f.write(str(date) + "\n")
 
+    topics = list(range(1, 51))
+
     print("visualizing documents")
     topic_model.visualize_documents(
-        docs=documents,
-        sample=0.05,
+        docs=documents, sample=0.05, topics=topics
     ).write_html(f"documents_batch-{batch_number}.html")
 
     print("visualizing topics")
-    topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
+    topic_model.visualize_topics(top_n_topics=50).write_html(
+        f"topics-{batch_number}.html"
+    )
 
     print("visualizing Hierarchy")
     topic_model.visualize_hierarchy(top_n_topics=50).write_html(
@@ -257,7 +260,7 @@ def main(batch_number: int = 0):
     topics_per_category = topic_model.topics_per_class(documents, categories)
 
     print("Visualizing Topics per category")
-    topics_per_category.visualize_topics_per_class().write_html(
+    topics_per_category.visualize_topics_per_class(top_n_topics=50).write_html(
         f"topics_per_category{batch_number}.html"
     )
 
