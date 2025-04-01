@@ -215,7 +215,7 @@ def main(batch_number: int = 0):
     print(len(dates))
     print(len(categories))
     if not os.path.exists(f"topic_model_batch_{batch_number}"):
-        topic_model = topic_model.fit(documents, embeddings)
+        topic_model.fit_transform(documents, embeddings)
         topic_model.save(f"topic_model_batch_{batch_number}")
     else:
         topic_model.load(f"topic_model_batch_{batch_number}")
