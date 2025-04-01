@@ -1,4 +1,3 @@
-from PIL.Image import merge
 from bertopic import BERTopic
 import glob
 from sentence_transformers import SentenceTransformer
@@ -19,30 +18,24 @@ bertopic_models = [
 
 merged_model = BERTopic.merge_models(bertopic_models)
 
-merged_model.save("./merged1-6model")
+topic_model = merged_model
 
-doc_files = glob.glob("../document*.txt")
+batch_number = "999"
 
-umap_model = UMAP(
-    n_components=2, n_neighbors=15, min_dist=0.0, random_state=42, verbose=True
+print("visualizing topics")
+topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
+
+print("visualizing Hierarchy")
+topic_model.visualize_hierarchy(top_n_topics=50).write_html(
+    f"hierarchy-{batch_number}.html"
 )
 
-hdbscan_model = HDBSCAN(
-    min_cluster_size=15, min_samples=1, prediction_data=True, verbose=True
+print("Visualizing heatmap")
+topic_model.visualize_heatmap(top_n_topics=50).write_html(
+    f"heatmap-{batch_number}.html"
 )
 
-embeddings = embedding_model.encode(documents, show_progress_bar=True)
-
-embeddings = normalize(embeddings)
-
-reduced_embeddings = umap_model.fit_transform(embeddings)
-
-topic_model = BERTopic(
-    umap_model=umap_model,
-    hdbscan_model=hdbscan_model,
-    verbose=True,
+print("Visualizing barchart")
+topic_model.visualize_barchart(top_n_topics=50).write_html(
+    f"barchart-{batch_number}.html"
 )
-
-topic_model = topic_model.fit(documents, embeddings)
-
-topic_model.save(f"topic_model_batch_{batch_number}")
