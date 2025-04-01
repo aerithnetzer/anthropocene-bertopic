@@ -211,9 +211,11 @@ def main(batch_number: int = 0):
         verbose=True,
     )
 
-    topic_model = topic_model.fit(documents, embeddings)
-
-    topic_model.save(f"topic_model_batch_{batch_number}")
+    if not os.path.exists(f"topic_model_batch_{batch_number}"):
+        topic_model = topic_model.fit(documents, embeddings)
+        topic_model.save(f"topic_model_batch_{batch_number}")
+    else:
+        topic_model.load(f"topic_model_batch_{batch_number}")
 
     # with open(f"titles-{batch_number}.txt", "w", encoding="utf-8") as f:
     #     for title in tqdm(titles, desc="Writing titles"):
