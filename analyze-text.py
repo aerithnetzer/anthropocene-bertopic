@@ -210,7 +210,9 @@ def main(batch_number: int = 0):
         hdbscan_model=hdbscan_model,
         verbose=True,
     )
-
+    print(len(documents))
+    print(len(dates))
+    print(len(categories))
     if not os.path.exists(f"topic_model_batch_{batch_number}"):
         topic_model = topic_model.fit(documents, embeddings)
         topic_model.save(f"topic_model_batch_{batch_number}")
