@@ -214,6 +214,7 @@ def main(batch_number: int = 0):
     print(len(documents))
     print(len(dates))
     print(len(categories))
+
     if not os.path.exists(f"topic_model_batch_{batch_number}"):
         topic_model.fit_transform(documents, embeddings)
         topic_model.save(f"topic_model_batch_{batch_number}")
@@ -269,18 +270,18 @@ def main(batch_number: int = 0):
     topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
 
     print("Visualizing topics over time")
-    topics_over_time.visualize_topics_over_time(top_n_topics=50).write_html(
-        f"topics_over_time-batch{batch_number}.html"
-    )
+    topic_model.visualize_topics_over_time(
+        topics_over_time, top_n_topics=50
+    ).write_html(f"topics_over_time-batch{batch_number}.html")
 
     print("Calculating Topics per category")
 
     topics_per_category = topic_model.topics_per_class(documents, categories)
 
     print("Visualizing Topics per category")
-    topics_per_category.visualize_topics_per_class(top_n_topics=50).write_html(
-        f"topics_per_category{batch_number}.html"
-    )
+    topic_model.visualize_topics_per_class(
+        topics_per_category, top_n_topics=50
+    ).write_html(f"topics_per_category{batch_number}.html")
 
 
 if __name__ == "__main__":
