@@ -175,8 +175,8 @@ def main(batch_number: int = 0):
         documents = [line for line in f.readlines()]
 
     # Clean the data
-    print("Cleaning data...")
-    documents = clean_texts_parallel(documents, max_workers=None)
+    # print("Cleaning data...")
+    # documents = clean_texts_parallel(documents, max_workers=None)
 
     model = BERTopic(verbose=True)
     topic_model = model.load(f"topic_model_batch_{batch_number}")
