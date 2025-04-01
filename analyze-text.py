@@ -2,8 +2,6 @@ from tqdm import tqdm
 import time
 import os
 import numpy as np
-from bertopic import BERTopic
-from sentence_transformers import SentenceTransformer
 import boto3
 import pandas as pd
 from typing import List, Dict, Any
@@ -27,8 +25,6 @@ NUMBERS_PATTERN = re.compile(r"\d+")
 STOP_WORDS = frozenset(stopwords.words("english"))
 ENGLISH_WORDS = frozenset(words.words())
 print("Modules loaded")
-
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def download_nltk_resources():
@@ -168,10 +164,9 @@ def main(batch_number: int = 0):
         documents = [line for line in f.readlines()]
 
     categories = []
-    dates = []
 
     with open(f"dates-{batch_number}.txt", "r") as f:
-        categories = [list(line) for line in f.readlines()]
+        categories = [line.replace("\n", "") for line in f.readlines()]
         categories = [str(categories[1]) for category in categories]
 
     with open(f"categories-{batch_number}.txt", "r") as f:
@@ -286,4 +281,4 @@ def main(batch_number: int = 0):
 
 
 if __name__ == "__main__":
-    main(batch_number=1)
+    main(batch_number=6)
