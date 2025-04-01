@@ -220,7 +220,7 @@ def main(batch_number: int = 0):
         topic_model.fit_transform(documents, embeddings)
         topic_model.save(f"topic_model_batch_{batch_number}")
     else:
-        topic_model.load(f"topic_model_batch_{batch_number}")
+        topic_model = topic_model.load(f"topic_model_batch_{batch_number}")
 
     # with open(f"titles-{batch_number}.txt", "w", encoding="utf-8") as f:
     #     for title in tqdm(titles, desc="Writing titles"):
