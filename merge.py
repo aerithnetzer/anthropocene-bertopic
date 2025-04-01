@@ -22,6 +22,50 @@ for model in bertopic_models:
     model = BERTopic(verbose=True).load(model)
     loaded_models.append(model)
 
+
+corpora_docs = [
+    "corpus-1.txt",
+    "corpus-2.txt",
+    "corpus-3.txt",
+    "corpus-4.txt",
+    "corpus-5.txt",
+    "corpus-6.txt",
+]
+
+category_docs = [
+    "dates-1.txt",
+    "dates-2.txt",
+    "dates-3.txt",
+    "dates-4.txt",
+    "dates-5.txt",
+    "dates-6.txt",
+]
+
+date_docs = [
+    "categories-1.txt",
+    "categories-2.txt",
+    "categories-3.txt",
+    "categories-4.txt",
+    "categories-5.txt",
+    "categories-6.txt",
+]
+
+for corpus_doc in corpora_docs:
+    with open(corpus_doc, "r") as f:
+        documents = [line for line in f.readlines()]
+
+for category_doc in category_docs:
+    with open(category_doc, "r") as f:
+        lines = f.readlines()
+        categories = [
+            line.strip().replace("[", "").replace("]", "").split(",")[0].strip("' ")
+            for line in lines
+        ]
+
+for date_doc in date_docs:
+    with open(date_doc, "r") as f:
+        dates = [line for line in f.readlines()]
+
 merged_model = BERTopic().merge_models(loaded_models)
 
 topic_model = merged_model
@@ -29,19 +73,27 @@ topic_model = merged_model
 batch_number = "999"
 
 print("visualizing topics")
-topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
+topic_model.visualize_topics(top_n_topics=20).write_html(f"topics-{batch_number}.html")
+
+topics = list(range(1, 21))
+print("Visualizing topics over time")
+
+topics_over_time = topic_model.topics_over_time(
+    docs=documents, timestamps=dates, topics=topics, nr_bins=20
+)
+topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=20)
 
 print("visualizing Hierarchy")
-topic_model.visualize_hierarchy(top_n_topics=50).write_html(
+topic_model.visualize_hierarchy(top_n_topics=20).write_html(
     f"hierarchy-{batch_number}.html"
 )
 
 print("Visualizing heatmap")
-topic_model.visualize_heatmap(top_n_topics=50).write_html(
+topic_model.visualize_heatmap(top_n_topics=20).write_html(
     f"heatmap-{batch_number}.html"
 )
 
 print("Visualizing barchart")
-topic_model.visualize_barchart(top_n_topics=50).write_html(
+topic_model.visualize_barchart(top_n_topics=20).write_html(
     f"barchart-{batch_number}.html"
 )
