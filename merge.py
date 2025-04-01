@@ -73,6 +73,10 @@ print(len(dates))
 print(len(documents))
 print(len(categories))
 
+print("Date: ", dates[0])
+print("Doc: ", documents[0])
+print("Category: ", categories[0])
+
 merged_model = BERTopic().merge_models(loaded_models)
 
 topic_model = merged_model
