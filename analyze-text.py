@@ -271,7 +271,7 @@ def main(batch_number: int = 0):
     )
 
     print("Calculating topics over time")
-    topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
+    topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=5)
 
     print("Visualizing topics over time")
     topic_model.visualize_topics_over_time(
