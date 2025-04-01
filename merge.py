@@ -50,21 +50,24 @@ date_docs = [
     "categories-6.txt",
 ]
 
+documents = []
 for corpus_doc in corpora_docs:
     with open(corpus_doc, "r") as f:
-        documents = [line for line in f.readlines()]
-
+        for line in f.readlines():
+            documents.append(line)
+categories = []
 for category_doc in category_docs:
     with open(category_doc, "r") as f:
-        lines = f.readlines()
-        categories = [
-            line.strip().replace("[", "").replace("]", "").split(",")[0].strip("' ")
-            for line in lines
-        ]
+        for line in f.readlines():
+            categories.append(
+                line.strip().replace("[", "").replace("]", "").split(",")[0].strip("' ")
+            )
 
+dates = []
 for date_doc in date_docs:
     with open(date_doc, "r") as f:
-        dates = [line for line in f.readlines()]
+        for line in f.readlines():
+            dates.append(line)
 
 print(len(dates))
 print(len(documents))
