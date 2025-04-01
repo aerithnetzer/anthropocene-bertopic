@@ -170,9 +170,8 @@ def main(batch_number: int = 0):
 
     with open(f"dates-{batch_number}.txt", "r") as f:
         categories = [line.replace("\n", "") for line in f.readlines()]
+        print(categories[1])
         categories = [str(categories[1]) for category in categories]
-
-    print(categories[0])
 
     with open(f"categories-{batch_number}.txt", "r") as f:
         dates = [line for line in f.readlines()]
