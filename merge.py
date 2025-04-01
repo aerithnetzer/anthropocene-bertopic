@@ -8,15 +8,15 @@ from cuml.preprocessing import normalize
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 bertopic_models = [
-    "topic-model-1",
-    "topic-model-2",
-    "topic-model-3",
-    "topic-model-4",
-    "topic-model-5",
-    "topic-model-6",
+    "topic_model_batch_1",
+    "topic_model_batch_2",
+    "topic_model_batch_3",
+    "topic_model_batch_4",
+    "topic_model_batch_5",
+    "topic_model_batch_6",
 ]
 
-merged_model = BERTopic.merge_models(bertopic_models)
+merged_model = BERTopic().merge_models(bertopic_models)
 
 topic_model = merged_model
 
