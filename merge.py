@@ -66,6 +66,10 @@ for date_doc in date_docs:
     with open(date_doc, "r") as f:
         dates = [line for line in f.readlines()]
 
+print(len(dates))
+print(len(documents))
+print(len(categories))
+
 merged_model = BERTopic().merge_models(loaded_models)
 
 topic_model = merged_model
