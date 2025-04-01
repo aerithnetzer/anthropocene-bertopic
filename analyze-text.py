@@ -1,5 +1,6 @@
 from tqdm import tqdm
 import time
+import os
 import numpy as np
 from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
@@ -178,32 +179,41 @@ def main(batch_number: int = 0):
     # print("Cleaning data...")
     # documents = clean_texts_parallel(documents, max_workers=None)
 
-    model = BERTopic(verbose=True)
-    topic_model = model.load(f"topic_model_batch_{batch_number}")
+    # model = BERTopic(verbose=True)
+    # topic_model = model.load(f"topic_model_batch_{batch_number}")
 
-    # umap_model = UMAP(
-    #     n_components=2, n_neighbors=15, min_dist=0.0, random_state=42, verbose=True
-    # )
-    #
-    # hdbscan_model = HDBSCAN(
-    #     min_cluster_size=15, min_samples=1, prediction_data=True, verbose=True
-    # )
-    #
-    # embeddings = embedding_model.encode(documents, show_progress_bar=True)
-    #
-    # embeddings = normalize(embeddings)
-    #
-    # reduced_embeddings = umap_model.fit_transform(embeddings)
-    #
-    # topic_model = BERTopic(
-    #     umap_model=umap_model,
-    #     hdbscan_model=hdbscan_model,
-    #     verbose=True,
-    # )
+    umap_model = UMAP(
+        n_components=2, n_neighbors=15, min_dist=0.0, random_state=42, verbose=True
+    )
 
-    # topic_model = topic_model.fit(documents, embeddings)
-    #
-    # topic_model.save(f"topic_model_batch_{batch_number}")
+    hdbscan_model = HDBSCAN(
+        min_cluster_size=15, min_samples=1, prediction_data=True, verbose=True
+    )
+
+    if not os.path.exists(f"embeddings-{batch_number}"):
+        embeddings = embedding_model.encode(documents, show_progress_bar=True)
+        embeddings = normalize(embeddings)
+        np.savetxt(f"embeddings-{batch_number}", embeddings)
+
+    else:
+        embeddings = np.loadtxt(f"embeddings-{batch_number}")
+
+    if not os.path.exists(f"reduced_embeddings-{batch_number}"):
+        reduced_embeddings = umap_model.fit_transform(embeddings)
+        np.savetxt(f"reduced_embeddings-{batch_number}", reduced_embeddings)
+
+    else:
+        reduced_embeddings = np.loadtxt(f"reduced_embeddings-{batch_number}")
+
+    topic_model = BERTopic(
+        umap_model=umap_model,
+        hdbscan_model=hdbscan_model,
+        verbose=True,
+    )
+
+    topic_model = topic_model.fit(documents, embeddings)
+
+    topic_model.save(f"topic_model_batch_{batch_number}")
 
     # with open(f"titles-{batch_number}.txt", "w", encoding="utf-8") as f:
     #     for title in tqdm(titles, desc="Writing titles"):
@@ -221,11 +231,14 @@ def main(batch_number: int = 0):
     #     for date in tqdm(dates, desc="Writing dates"):
     #         f.write(str(date) + "\n")
 
-    topics = list(range(1, 51))
+    topics = list(range(1, 21))
 
     print("visualizing documents")
     topic_model.visualize_documents(
-        docs=documents, sample=0.05, topics=topics
+        docs=documents,
+        sample=0.05,
+        topics=topics,
+        reduced_embeddings=reduced_embeddings,
     ).write_html(f"documents_batch-{batch_number}.html")
 
     print("visualizing topics")
