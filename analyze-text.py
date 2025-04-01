@@ -1,6 +1,8 @@
 from tqdm import tqdm
 import time
 import os
+from bertopic import BERTopic
+from sentence_transformers import SentenceTransformer
 import numpy as np
 import boto3
 import pandas as pd
@@ -16,6 +18,7 @@ from cuml.cluster import HDBSCAN
 from cuml.manifold import UMAP
 from cuml.preprocessing import normalize
 import concurrent.futures
+
 
 # Precompile regex patterns
 PUNCTUATION_PATTERN = re.compile(f"[{re.escape(string.punctuation)}]")
@@ -186,6 +189,8 @@ def main(batch_number: int = 0):
     hdbscan_model = HDBSCAN(
         min_cluster_size=15, min_samples=1, prediction_data=True, verbose=True
     )
+
+    embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
     if not os.path.exists(f"embeddings-{batch_number}"):
         embeddings = embedding_model.encode(documents, show_progress_bar=True)
