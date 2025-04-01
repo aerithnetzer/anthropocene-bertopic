@@ -16,7 +16,13 @@ bertopic_models = [
     "topic_model_batch_6",
 ]
 
-merged_model = BERTopic().merge_models(bertopic_models)
+loaded_models = []
+
+for model in bertopic_models:
+    model = BERTopic(verbose=True).load(model)
+    loaded_models.append(model)
+
+merged_model = BERTopic().merge_models(loaded_models)
 
 topic_model = merged_model
 
