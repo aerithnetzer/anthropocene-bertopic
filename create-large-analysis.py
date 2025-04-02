@@ -47,7 +47,7 @@ for file in jsonl_files:
 
     # Assume text is in a column named "text"
     if "fullText" in df.columns:
-        df["cleaned_text"] = df["fullText"].applymap(clean_text)
+        df["cleaned_text"] = df["fullText"].apply(clean_text)
 
     df_list.append(df)
 
