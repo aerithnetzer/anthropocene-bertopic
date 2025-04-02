@@ -14,9 +14,10 @@ from nltk.corpus import stopwords, words
 from nltk.tokenize import word_tokenize
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing
-from cuml.cluster import HDBSCAN
-from cuml.manifold import UMAP
-from cuml.preprocessing import normalize
+
+# from cuml.cluster import HDBSCAN
+# from cuml.manifold import UMAP
+# from cuml.preprocessing import normalize
 import concurrent.futures
 
 # Precompile regex patterns
@@ -87,18 +88,15 @@ def clean_texts_parallel(texts: List[str], max_workers=None) -> List[str]:
     return cleaned_texts
 
 
-def fetch_jsonl(s3_client, bucket_name, key):
+def fetch_jsonl():
     """Fetches a JSONL file from S3 and extracts relevant fields."""
-    response = s3_client.get_object(Bucket=bucket_name, Key=key)
-    content = response["Body"].read().decode("utf-8")
-    df = pd.read_json(content, lines=True)
-
+    # response = s3_client.get_object(Bucket=bucket_name, Key=key)
+    # content = response["Body"].read().decode("utf-8")
+    # df = pd.read_json(content, lines=True)
+    df = pd.read_json("/Volumes/T7/part-1.jsonl")
     # Extract relevant columns and preprocess
-    df["fullText"] = (
-        df["fullText"]
-        .astype(str)
-        .str.split()
-        .apply(lambda x: " ".join(x[:100]).replace("\n", " "))
+    df["fullText"] = df["fullText"].apply(
+        lambda x: x.replace("\n", " ").replace(stopwords, "")
     )
 
     return df[["title", "fullText", "tdmCategory", "datePublished"]]
@@ -158,39 +156,40 @@ def load_jsonl_from_s3(bucket_name: str, prefix: str = "constellate/"):
 
 def main(batch_number: int = 0):
     # Configure S3 bucket information
-    bucket_name = "anthropocene-data"  # Replace with your bucket name
-    prefix = f"constellate/batch-{batch_number}/"
+    # bucket_name = "anthropocene-data"  # Replace with your bucket name
+    # prefix = f"constellate/batch-{batch_number}/"
 
-    # Load documents from S3
-    documents, dates, categories, titles = load_jsonl_from_s3(bucket_name, prefix)
+    df = fetch_jsonl()
+
+    documents = df["fullText"].astype(str)
 
     # Clean the data
     print("Cleaning data...")
     documents = clean_texts_parallel(documents, max_workers=None)
 
-    # umap_model = UMAP(
-    #     n_components=2, n_neighbors=15, min_dist=0.0, random_state=42, verbose=True
-    # )
-    #
-    # hdbscan_model = HDBSCAN(
-    #     min_cluster_size=15, min_samples=1, prediction_data=True, verbose=True
-    # )
-    #
-    # embeddings = embedding_model.encode(documents, show_progress_bar=True)
-    #
-    # embeddings = normalize(embeddings)
-    #
-    # reduced_embeddings = umap_model.fit_transform(embeddings)
-    #
-    # topic_model = BERTopic(
-    #     umap_model=umap_model,
-    #     hdbscan_model=hdbscan_model,
-    #     verbose=True,
-    # )
+    umap_model = UMAP(
+        n_components=2, n_neighbors=15, min_dist=0.0, random_state=42, verbose=True
+    )
 
-    # topic_model = topic_model.fit(documents, embeddings)
-    #
-    # topic_model.save(f"topic_model_batch_{batch_number}")
+    hdbscan_model = HDBSCAN(
+        min_cluster_size=15, min_samples=1, prediction_data=True, verbose=True
+    )
+
+    embeddings = embedding_model.encode(documents, show_progress_bar=True)
+
+    embeddings = normalize(embeddings)
+
+    reduced_embeddings = umap_model.fit_transform(embeddings)
+
+    topic_model = BERTopic(
+        umap_model=umap_model,
+        hdbscan_model=hdbscan_model,
+        verbose=True,
+    )
+
+    topic_model = topic_model.fit(documents, embeddings)
+
+    topic_model.save(f"topic_model_batch_{batch_number}")
 
     with open(f"titles-{batch_number}.txt", "w", encoding="utf-8") as f:
         for title in tqdm(titles, desc="Writing titles"):
@@ -208,47 +207,47 @@ def main(batch_number: int = 0):
         for date in tqdm(dates, desc="Writing dates"):
             f.write(str(date) + "\n")
 
-    # print("visualizing documents")
-    # topic_model.visualize_documents(
-    #     docs=documents,
-    #     sample=0.05,
-    #     embeddings=embeddings,
-    #     reduced_embeddings=reduced_embeddings,
-    # ).write_html(f"documents_batch-{batch_number}.html")
-    #
-    # print("visualizing topics")
-    # topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
-    #
-    # print("visualizing Hierarchy")
-    # topic_model.visualize_hierarchy(top_n_topics=50).write_html(
-    #     f"hierarchy-{batch_number}.html"
-    # )
-    #
-    # print("Visualizing heatmap")
-    # topic_model.visualize_heatmap(top_n_topics=50).write_html(
-    #     f"heatmap-{batch_number}.html"
-    # )
-    # print("Visualizing barchart")
-    # topic_model.visualize_barchart(top_n_topics=50).write_html(
-    #     f"barchart-{batch_number}.html"
-    # )
-    #
-    # print("Calculating topics over time")
-    # topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
-    #
-    # print("Visualizing topics over time")
-    # topics_over_time.visualize_topics_over_time(top_n_topics=50).write_html(
-    #     f"topics_over_time-batch{batch_number}.html"
-    # )
-    #
-    # print("Calculating Topics per category")
-    #
-    # topics_per_category = topic_model.topics_per_class(documents, categories)
-    #
-    # print("Visualizing Topics per category")
-    # topics_per_category.visualize_topics_per_class().write_html(
-    #     f"topics_per_category{batch_number}.html"
-    # )
+    print("visualizing documents")
+    topic_model.visualize_documents(
+        docs=documents,
+        sample=0.05,
+        embeddings=embeddings,
+        reduced_embeddings=reduced_embeddings,
+    ).write_html(f"documents_batch-{batch_number}.html")
+
+    print("visualizing topics")
+    topic_model.visualize_topics().write_html(f"topics-{batch_number}.html")
+
+    print("visualizing Hierarchy")
+    topic_model.visualize_hierarchy(top_n_topics=50).write_html(
+        f"hierarchy-{batch_number}.html"
+    )
+
+    print("Visualizing heatmap")
+    topic_model.visualize_heatmap(top_n_topics=50).write_html(
+        f"heatmap-{batch_number}.html"
+    )
+    print("Visualizing barchart")
+    topic_model.visualize_barchart(top_n_topics=50).write_html(
+        f"barchart-{batch_number}.html"
+    )
+
+    print("Calculating topics over time")
+    topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=100)
+
+    print("Visualizing topics over time")
+    topics_over_time.visualize_topics_over_time(top_n_topics=50).write_html(
+        f"topics_over_time-batch{batch_number}.html"
+    )
+
+    print("Calculating Topics per category")
+
+    topics_per_category = topic_model.topics_per_class(documents, categories)
+
+    print("Visualizing Topics per category")
+    topics_per_category.visualize_topics_per_class().write_html(
+        f"topics_per_category{batch_number}.html"
+    )
 
 
 if __name__ == "__main__":
