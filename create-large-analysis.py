@@ -68,7 +68,14 @@ documents = df["cleaned_text"].to_pandas().dropna().tolist()
 print(df["cleaned_text"].head())
 # Ensure only relevant columns are kept
 columns_to_save = ["title", "tdmCategory", "datePublished", "cleaned_text"]
-
+dates = df["datePublished"]
+categories = []
+for category_doc in df["tdmCategory"]:
+    with open(category_doc, "r") as f:
+        for line in f.readlines():
+            categories.append(
+                line.strip().replace("[", "").replace("]", "").split(",")[0].strip("' ")
+            )
 # Check if all columns exist in df (to avoid errors if a column is missing)
 existing_columns = [col for col in columns_to_save if col in df.columns]
 
