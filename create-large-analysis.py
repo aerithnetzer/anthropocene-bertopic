@@ -19,6 +19,8 @@ batch_number = 1
 stop_words = set(stopwords.words("english"))
 valid_words = set(words.words())
 
+print("Reading json files")
+
 # Get all JSONL files in the current directory
 jsonl_files = glob.glob(f"part-{batch_number}.jsonl")
 
@@ -37,14 +39,15 @@ def clean_text(text):
     return " ".join(words_list)
 
 
+print("Loading and cleaning data")
 # Load and clean data
 df_list = []
 for file in jsonl_files:
     df = cudf.read_json(file, lines=True)
 
     # Assume text is in a column named "text"
-    if "text" in df.columns:
-        df["cleaned_text"] = df["text"].applymap(clean_text)
+    if "fullText" in df.columns:
+        df["cleaned_text"] = df["fullText"].applymap(clean_text)
 
     df_list.append(df)
 
@@ -60,6 +63,7 @@ columns_to_save = ["title", "tdmCategory", "datePublished", "cleaned_text"]
 # Check if all columns exist in df (to avoid errors if a column is missing)
 existing_columns = [col for col in columns_to_save if col in df.columns]
 
+print("saving columns")
 # Save selected columns to HDF5
 df[existing_columns].to_pandas().to_hdf(
     f"cleaned_text{batch_number}.h5", key="df", mode="w"
