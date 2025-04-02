@@ -37,3 +37,6 @@ def main():
 
     # Print the titles corresponding to the representative documents
     print("\nRepresentative Document Titles:")
+
+
+main()
