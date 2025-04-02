@@ -30,6 +30,7 @@ def main():
     doc_line_numbers = [
         i for i, line in enumerate(corpus_lines) if line.strip() in representative_docs
     ]
+    print(doc_line_numbers)
 
     # Read titles file and get corresponding titles
     titles_file = f"titles-{model_number}.txt"
