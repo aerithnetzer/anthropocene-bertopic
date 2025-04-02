@@ -29,7 +29,6 @@ def main():
     doc_line_numbers = [
         i for i, line in enumerate(corpus_lines) if line.strip() in representative_docs
     ]
-    print(doc_line_numbers)
 
     # Read titles file and get corresponding titles
     titles_file = f"titles-{model_number}.txt"
@@ -38,6 +37,10 @@ def main():
 
     # Print the titles corresponding to the representative documents
     print("\nRepresentative Document Titles:")
+    for line_num in doc_line_numbers:
+        if line_num < len(title_lines):  # Ensure index is within bounds
+            print(title_lines[line_num].strip())
 
 
-main()
+if __name__ == "__main__":
+    main()
