@@ -33,9 +33,7 @@ def clean_text(text):
     text = text.lower()  # Convert to lowercase
     text = re.sub(r"[^a-z\s]", "", text)  # Keep only English letters and spaces
     words_list = text.split()  # Tokenize
-    words_list = [
-        word for word in words_list if word in valid_words and word not in stop_words
-    ]  # Filter
+    words_list = [word for word in words_list if word not in stop_words]  # Filter
     return " ".join(words_list)
 
 
