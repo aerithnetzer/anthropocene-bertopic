@@ -67,8 +67,21 @@ documents = df["cleaned_text"].to_pandas().dropna().tolist()
 
 
 def extract_cats(text):
-    text = str(text).strip().replace("[", "").replace("]", "").strip("' ")
-    return text
+    # Ensure it's a string and clean up formatting
+    text = (
+        str(text)
+        .strip()
+        .replace("[", "")
+        .replace("]", "")
+        .replace('"', "")
+        .replace("'", "")
+    )
+
+    # Split by comma and take the first element
+    categories = text.split(",")
+
+    # Return the first category if it exists
+    return categories[0].strip() if categories else None
 
 
 print(df["cleaned_text"].head())
