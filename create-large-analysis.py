@@ -136,7 +136,7 @@ print("Visualizing topics over time")
 topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=50).write_html(
     f"v2_viz/topics_over_time-batch{batch_number}.html"
 )
-
+categories = df["tdmCategory"].to_pandas().to_list()
 print("Calculating topics per category")
 topics_per_class = topic_model.topics_per_class(docs=documents, classes=categories)
 topic_model.visualize_topics_per_class(
