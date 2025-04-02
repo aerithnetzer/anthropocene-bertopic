@@ -20,7 +20,7 @@ def main():
     # Get representative documents
     representative_docs = topic_model.get_representative_docs(topic_number)
     representative_docs = [doc.replace("\n", "") for doc in representative_docs]
-
+    print(representative_docs)
     # Read the corpus file and find line numbers of representative documents
     corpus_file = f"corpus-{model_number}.txt"
     with open(corpus_file, "r", encoding="utf-8") as f:
