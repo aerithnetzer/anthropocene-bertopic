@@ -65,19 +65,20 @@ print(df["fullText"].head())
 # Convert cuDF column to a pandas list for BERTopic
 documents = df["cleaned_text"].to_pandas().dropna().tolist()
 
+
+def extract_cats(text):
+    text = str(text).strip().replace("[", "").replace("]", "").strip("' ")
+    return text
+
+
 print(df["cleaned_text"].head())
 # Ensure only relevant columns are kept
 columns_to_save = ["title", "tdmCategory", "datePublished", "cleaned_text"]
 dates = df["datePublished"]
-categories = []
-categories = [
-    str(category).strip().replace("[", "").replace("]", "").strip("' ")
-    for category in df["tdmCategory"].to_pandas()
-]
+df["tdmCategory"] = df["tdmCategory"].to_pandas().apply(extract_cats)
 
-print(categories[0])
-print(categories[1])
-print(categories[2])
+print(df["tdmCategory"].unique())
+
 # Check if all columns exist in df (to avoid errors if a column is missing)
 existing_columns = [col for col in columns_to_save if col in df.columns]
 
@@ -99,6 +100,7 @@ umap_model = UMAP(n_components=5, random_state=42)
 
 # GPU-accelerated HDBSCAN for clustering
 hdbscan_model = HDBSCAN(min_cluster_size=5, gen_min_span_tree=True)
+
 
 # Initialize and fit BERTopic with GPU-accelerated models
 topic_model = BERTopic(umap_model=umap_model, hdbscan_model=hdbscan_model, verbose=True)
