@@ -22,7 +22,7 @@ valid_words = set(words.words())
 print("Reading json files")
 
 # Get all JSONL files in the current directory
-jsonl_files = glob.glob(f"part-{batch_number}.jsonl")
+jsonl_files = glob.glob("part-*.jsonl")
 
 
 # Function to clean text
@@ -48,16 +48,16 @@ df_list = []
 for file in jsonl_files:
     df = cudf.read_json(file, lines=True)
 
-# Convert to pandas first, apply the function, then convert back to cuDF
-if "fullText" in df.columns:
-    df["cleaned_text"] = df["fullText"].to_pandas().astype(str).apply(clean_text)
-    print(df["fullText"].head())
-    print(df["cleaned_text"].head())
+    # Convert to pandas first, apply the function, then convert back to cuDF
+    if "fullText" in df.columns:
+        df["cleaned_text"] = df["fullText"].to_pandas().astype(str).apply(clean_text)
+        print(df["fullText"].head())
+        print(df["cleaned_text"].head())
 
-    # Convert back to cuDF for further processing
-    df["cleaned_text"] = cudf.Series(df["cleaned_text"])
+        # Convert back to cuDF for further processing
+        df["cleaned_text"] = cudf.Series(df["cleaned_text"])
 
-    df_list.append(df)
+        df_list.append(df)
 
 # Combine all files into one DataFrame
 df = cudf.concat(df_list, ignore_index=True) if df_list else cudf.DataFrame()
@@ -74,6 +74,10 @@ categories = [
     str(category).strip().replace("[", "").replace("]", "").strip("' ")
     for category in df["tdmCategory"].to_pandas()
 ]
+
+print(categories[0])
+print(categories[1])
+print(categories[2])
 # Check if all columns exist in df (to avoid errors if a column is missing)
 existing_columns = [col for col in columns_to_save if col in df.columns]
 
