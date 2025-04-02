@@ -56,7 +56,7 @@ if "fullText" in df.columns:
 
 # Combine all files into one DataFrame
 df = cudf.concat(df_list, ignore_index=True) if df_list else cudf.DataFrame()
-
+print(df["fullText"].head())
 # Convert cuDF column to a pandas list for BERTopic
 documents = df["cleaned_text"].to_pandas().dropna().tolist()
 
