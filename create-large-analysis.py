@@ -98,7 +98,7 @@ existing_columns = [col for col in columns_to_save if col in df.columns]
 print("saving columns")
 # Save selected columns to HDF5
 df[existing_columns].to_pandas().to_hdf(
-    f"cleaned_text{batch_number}.h5", key="df", mode="w"
+    f"v2_viz/cleaned_text{batch_number}.h5", key="df", mode="w"
 )
 
 print("Saved cleaned DataFrame to cleaned_text.h5 with columns:", existing_columns)
