@@ -70,7 +70,7 @@ print(df["cleaned_text"].head())
 columns_to_save = ["title", "tdmCategory", "datePublished", "cleaned_text"]
 dates = df["datePublished"]
 categories = []
-for category_doc in df["tdmCategory"]:
+for category_doc in df["tdmCategory"].to_pandas():
     with open(category_doc, "r") as f:
         for line in f.readlines():
             categories.append(
