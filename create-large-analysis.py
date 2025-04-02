@@ -109,7 +109,9 @@ topics = list(range(1, 21))
 print("Visualizing topics over time")
 
 print("Calculating topics over time")
-topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=50)
+topics_over_time = topic_model.topics_over_time(
+    documents, dates.to_pandas().to_list(), nr_bins=50
+)
 
 print("Visualizing topics over time")
 topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=50).write_html(
