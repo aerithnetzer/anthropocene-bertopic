@@ -42,5 +42,4 @@ def main():
             print(title_lines[line_num].strip())
 
 
-if __name__ == "__main__":
-    main()
+main()
