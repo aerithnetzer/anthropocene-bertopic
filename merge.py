@@ -1,5 +1,6 @@
 from bertopic import BERTopic
 import glob
+from pandas.core.dtypes.common import classes
 from sentence_transformers import SentenceTransformer
 from cuml.cluster import HDBSCAN
 from cuml.manifold import UMAP
@@ -92,11 +93,17 @@ topics = list(range(1, 21))
 print("Visualizing topics over time")
 
 print("Calculating topics over time")
-topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=20)
+topics_over_time = topic_model.topics_over_time(documents, dates, nr_bins=50)
 
 print("Visualizing topics over time")
 topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=50).write_html(
     f"topics_over_time-batch{batch_number}.html"
+)
+
+print("Calculating topics per category")
+topics_per_class = topic_model.topics_per_class(docs=documents, classes=categories)
+topic_model.visualize_topics_per_class(
+    topics_per_class, top_n_topics=50, normalize_frequency=True
 )
 
 print("visualizing Hierarchy")
