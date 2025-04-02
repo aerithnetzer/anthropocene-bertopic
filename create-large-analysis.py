@@ -71,7 +71,7 @@ columns_to_save = ["title", "tdmCategory", "datePublished", "cleaned_text"]
 dates = df["datePublished"]
 categories = []
 categories = [
-    category.strip().replace("[", "").replace("]", "").strip("' ")
+    str(category).strip().replace("[", "").replace("]", "").strip("' ")
     for category in df["tdmCategory"].to_pandas()
 ]
 # Check if all columns exist in df (to avoid errors if a column is missing)
