@@ -8,18 +8,27 @@ embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Load BERTopic models
 bertopic_models = [
-    "topic_model_batch_1",
-    "topic_model_batch_2",
-    "topic_model_batch_3",
-    "topic_model_batch_4",
-    "topic_model_batch_5",
-    "topic_model_batch_6",
+    "v2_viz/large-bertopic-test-1",
+    "v2_viz/large-bertopic-test-2",
+    "v2_viz/large-bertopic-test-3",
+    "v2_viz/large-bertopic-test-4",
+    "v2_viz/large-bertopic-test-5",
+    "v2_viz/large-bertopic-test-6",
+    "v2_viz/large-bertopic-test-7",
 ]
 
 loaded_models = [BERTopic(verbose=True).load(model) for model in bertopic_models]
 
 # Get all .h5 files
-h5_files = glob.glob("*.h5")  # Adjust path if needed
+h5_files = [
+    "v2_viz/cleaned_text1.h5",
+    "v2_viz/cleaned_text2.h5",
+    "v2_viz/cleaned_text3.h5",
+    "v2_viz/cleaned_text4.h5",
+    "v2_viz/cleaned_text5.h5",
+    "v2_viz/cleaned_text6.h5",
+    "v2_viz/cleaned_text7.h5",
+]  # Adjust path if needed
 
 # Initialize empty lists for documents, categories, and dates
 documents = []
@@ -51,12 +60,12 @@ batch_number = "999"
 
 # Generate visualizations
 print("Generating visualizations...")
-model.visualize_topics(top_n_topics=20).write_html(f"topics-{batch_number}.html")
+model.visualize_topics(top_n_topics=20).write_html(f"v2_viz/topics-{batch_number}.html")
 
 print("Calculating topics over time")
 topics_over_time = model.topics_over_time(documents, dates, nr_bins=50)
 model.visualize_topics_over_time(topics_over_time, top_n_topics=50).write_html(
-    f"topics_over_time-batch{batch_number}.html"
+    f"v2_viz/topics_over_time-batch{batch_number}.html"
 )
 
 print("Calculating topics per category")
@@ -65,8 +74,14 @@ model.visualize_topics_per_class(
     topics_per_class, top_n_topics=50, normalize_frequency=True
 )
 
-model.visualize_hierarchy(top_n_topics=20).write_html(f"hierarchy-{batch_number}.html")
-model.visualize_heatmap(top_n_topics=20).write_html(f"heatmap-{batch_number}.html")
-model.visualize_barchart(top_n_topics=20).write_html(f"barchart-{batch_number}.html")
+model.visualize_hierarchy(top_n_topics=20).write_html(
+    f"v2_viz/hierarchy-{batch_number}.html"
+)
+model.visualize_heatmap(top_n_topics=20).write_html(
+    f"v2_viz/heatmap-{batch_number}.html"
+)
+model.visualize_barchart(top_n_topics=20).write_html(
+    f"v2_viz/barchart-{batch_number}.html"
+)
 
 print("Processing complete.")
