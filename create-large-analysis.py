@@ -60,6 +60,7 @@ df = cudf.concat(df_list, ignore_index=True) if df_list else cudf.DataFrame()
 # Convert cuDF column to a pandas list for BERTopic
 documents = df["cleaned_text"].to_pandas().dropna().tolist()
 
+print(df["cleaned_text"].head())
 # Ensure only relevant columns are kept
 columns_to_save = ["title", "tdmCategory", "datePublished", "cleaned_text"]
 
