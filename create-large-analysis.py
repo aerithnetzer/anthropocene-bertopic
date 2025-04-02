@@ -100,7 +100,7 @@ hdbscan_model = HDBSCAN(min_cluster_size=5, gen_min_span_tree=True)
 topic_model = BERTopic(umap_model=umap_model, hdbscan_model=hdbscan_model, verbose=True)
 topics, probs = topic_model.fit_transform(documents, embeddings)
 
-topic_model.save(f"large-bertopic-test-{batch_number}")
+topic_model.save(f"v2_viz/large-bertopic-test-{batch_number}")
 print("visualizing topics")
 
 topic_model.visualize_topics(top_n_topics=20).write_html(f"topics-{batch_number}.html")
@@ -115,26 +115,26 @@ topics_over_time = topic_model.topics_over_time(
 
 print("Visualizing topics over time")
 topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=50).write_html(
-    f"topics_over_time-batch{batch_number}.html"
+    f"v2_viz/topics_over_time-batch{batch_number}.html"
 )
 
 print("Calculating topics per category")
 topics_per_class = topic_model.topics_per_class(docs=documents, classes=categories)
 topic_model.visualize_topics_per_class(
     topics_per_class, top_n_topics=50, normalize_frequency=True
-)
+).write_html(f"v2_viz/categories-{batch_number}")
 
 print("visualizing Hierarchy")
 topic_model.visualize_hierarchy(top_n_topics=20).write_html(
-    f"hierarchy-{batch_number}.html"
+    f"v2_viz/large-hierarchy-{batch_number}.html"
 )
 
 print("Visualizing heatmap")
 topic_model.visualize_heatmap(top_n_topics=20).write_html(
-    f"heatmap-{batch_number}.html"
+    f"v2_viz/large-heatmap-{batch_number}.html"
 )
 
 print("Visualizing barchart")
 topic_model.visualize_barchart(top_n_topics=20).write_html(
-    f"barchart-{batch_number}.html"
+    f"v2_viz/large-barchart-{batch_number}.html"
 )
