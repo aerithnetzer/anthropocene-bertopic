@@ -45,9 +45,12 @@ df_list = []
 for file in jsonl_files:
     df = cudf.read_json(file, lines=True)
 
-    # Assume text is in a column named "text"
-    if "fullText" in df.columns:
-        df["cleaned_text"] = df["fullText"].apply(clean_text)
+# Convert to pandas first, apply the function, then convert back to cuDF
+if "fullText" in df.columns:
+    df["cleaned_text"] = df["fullText"].to_pandas().apply(clean_text)
+
+    # Convert back to cuDF for further processing
+    df["cleaned_text"] = cudf.Series(df["cleaned_text"])
 
     df_list.append(df)
 
