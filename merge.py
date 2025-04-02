@@ -40,7 +40,7 @@ for h5_file in h5_files:
     df = cudf.read_hdf(h5_file, key="df")  # Assuming key="df" in each file
 
     # Append data to lists
-    documents.extend(df["cleaned_txt"].to_arrow().to_pylist())
+    documents.extend(df["cleaned_text"].to_arrow().to_pylist())
     categories.extend(df["tdmCategory"].to_arrow().to_pylist())
     dates.extend(df["datePublished"].to_arrow().to_pylist())
 
