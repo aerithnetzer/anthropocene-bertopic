@@ -50,17 +50,21 @@ print(len(dates), len(documents), len(categories))
 model = BERTopic(verbose=True).load(
     "v2_viz/big-merged-model"
 )  # model = BERTopic().merge_models(loaded_models)
-model.update_topics(documents)
-representative_docs = model.get_representative_docs(3)
-print(representative_docs)
-
-for doc in representative_docs:
-    if representative_docs in documents:
-        index = documents.index(doc)
-        print(titles[index])
+# model.update_topics(documents)
+# representative_docs = model.get_representative_docs()
+# print(representative_docs)
+#
+# for doc in representative_docs:
+#     if representative_docs in documents:
+#         index = documents.index(doc)
+#         print(titles[index])
 # Read the corpus file and find line numbers of representative documents
 # Define batch number
 batch_number = "999"
+
+topics = model.get_topics()
+print("Topics:", len(topics))
+print(topics)
 
 # Generate visualizations
 print("Generating visualizations...")
@@ -68,9 +72,9 @@ model.visualize_topics(top_n_topics=20).write_html(f"v2_viz/topics-{batch_number
 
 print("Calculating topics over time")
 topics_over_time = model.topics_over_time(documents, dates, nr_bins=50)
-model.visualize_topics_over_time(topics_over_time, top_n_topics=50).write_html(
-    f"v2_viz/topics_over_time-batch{batch_number}.html"
-)
+model.visualize_topics_over_time(
+    topics_over_time, top_n_topics=50, normalize_frequency=True
+).write_html(f"v2_viz/topics_over_time-batch{batch_number}.html")
 
 print("Calculating topics per category")
 topics_per_class = model.topics_per_class(docs=documents, classes=categories)
