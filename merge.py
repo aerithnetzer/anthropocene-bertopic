@@ -58,6 +58,8 @@ model.update_topics(documents)
 model.save("v2_viz/big-merged-model")
 
 representative_docs = model.get_representative_docs(3)
+print(representative_docs)
+
 for doc in representative_docs:
     if representative_docs in documents:
         index = documents.index(doc)
