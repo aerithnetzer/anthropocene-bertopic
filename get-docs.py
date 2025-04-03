@@ -1,5 +1,7 @@
 from bertopic import BERTopic
 import argparse
+import pandas as pd
+import cudf
 
 # Set up argument parsing
 parser = argparse.ArgumentParser(prog="Get representative docs")
@@ -19,29 +21,39 @@ def main():
 
     # Get representative documents
     representative_docs = topic_model.get_representative_docs(topic_number)
-    representative_docs = [doc.replace("\n", "") for doc in representative_docs]
     print(representative_docs)
+
+    # Get all .h5 files
+    h5_files = [
+        "v2_viz/cleaned_text1.h5",
+        "v2_viz/cleaned_text2.h5",
+        "v2_viz/cleaned_text3.h5",
+        "v2_viz/cleaned_text4.h5",
+        "v2_viz/cleaned_text5.h5",
+        "v2_viz/cleaned_text6.h5",
+        "v2_viz/cleaned_text7.h5",
+    ]  # Adjust path if needed
+
+    # Initialize empty lists for documents, categories, and dates
+    documents = []
+    categories = []
+    dates = []
+    titles = []
+    # Read each HDF5 file
+    for h5_file in h5_files:
+        df = cudf.read_hdf(h5_file, key="df")  # Assuming key="df" in each file
+
+        # Append data to lists
+        documents.extend(df["cleaned_text"].to_arrow().to_pylist())
+        categories.extend(df["tdmCategory"].to_arrow().to_pylist())
+        dates.extend(df["datePublished"].to_arrow().to_pylist())
+        titles.extend(df["title"].to_arrow().to_pylist())
+
+    for doc in representative_docs:
+        if representative_docs in documents:
+            index = documents.index(doc)
+            print(titles[index])
     # Read the corpus file and find line numbers of representative documents
-    corpus_file = f"corpus-{model_number}.txt"
-    with open(corpus_file, "r", encoding="utf-8") as f:
-        corpus_lines = f.readlines()
-
-    # Find the line numbers of the representative documents
-    doc_line_numbers = [
-        i for i, line in enumerate(corpus_lines) if line.strip() in representative_docs
-    ]
-    print(doc_line_numbers)
-
-    # Read titles file and get corresponding titles
-    titles_file = f"titles-{model_number}.txt"
-    with open(titles_file, "r", encoding="utf-8") as f:
-        title_lines = f.readlines()
-
-    # Print the titles corresponding to the representative documents
-    print("\nRepresentative Document Titles:")
-    for line_num in doc_line_numbers:
-        if line_num < len(title_lines):  # Ensure index is within bounds
-            print(title_lines[line_num].strip())
 
 
 main()
