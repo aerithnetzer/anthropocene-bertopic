@@ -34,7 +34,7 @@ h5_files = [
 documents = []
 categories = []
 dates = []
-
+titles = []
 # Read each HDF5 file
 for h5_file in h5_files:
     df = cudf.read_hdf(h5_file, key="df")  # Assuming key="df" in each file
@@ -43,6 +43,7 @@ for h5_file in h5_files:
     documents.extend(df["cleaned_text"].to_arrow().to_pylist())
     categories.extend(df["tdmCategory"].to_arrow().to_pylist())
     dates.extend(df["datePublished"].to_arrow().to_pylist())
+    titles.extend(df["title"].to_arrow().to_pylist())
 
 # Check dataset sizes
 print(len(dates), len(documents), len(categories))
@@ -54,7 +55,14 @@ print("Category:", categories[0])
 # Merge BERTopic models
 model = BERTopic().merge_models(loaded_models)
 model.update_topics(documents)
+model.save("v2_viz/big-merged-model")
 
+representative_docs = model.get_representative_docs(3)
+for doc in representative_docs:
+    if representative_docs in documents:
+        index = documents.index(doc)
+        print(titles[index])
+# Read the corpus file and find line numbers of representative documents
 # Define batch number
 batch_number = "999"
 
