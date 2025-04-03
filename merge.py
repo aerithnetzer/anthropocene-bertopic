@@ -62,7 +62,9 @@ model = BERTopic(verbose=True).load(
 # Define batch number
 batch_number = "999"
 
-topics = model.get_topics()
+topics = model.topics_
+print(type(topics))
+print(topics[0:10])
 print("Topics:", len(topics))
 
 # Generate visualizations
