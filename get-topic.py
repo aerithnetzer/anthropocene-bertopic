@@ -4,9 +4,6 @@ import pandas as pd
 
 # Set up argument parsing
 parser = argparse.ArgumentParser(prog="Get representative docs")
-parser.add_argument(
-    "-m", "--model-number", required=True, type=str, help="Model number"
-)
 parser.add_argument("-t", "--topic-num", required=True, type=int, help="Topic number")
 
 
