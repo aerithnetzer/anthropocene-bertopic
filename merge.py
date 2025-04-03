@@ -64,7 +64,6 @@ batch_number = "999"
 
 topics = model.get_topics()
 print("Topics:", len(topics))
-print(topics)
 
 # Generate visualizations
 print("Generating visualizations...")
