@@ -17,8 +17,6 @@ bertopic_models = [
     "v2_viz/large-bertopic-test-7",
 ]
 
-loaded_models = [BERTopic(verbose=True).load(model) for model in bertopic_models]
-
 # Get all .h5 files
 h5_files = [
     "v2_viz/cleaned_text1.h5",
@@ -53,9 +51,9 @@ print("Doc:", documents[0])
 print("Category:", categories[0])
 
 # Merge BERTopic models
-model = BERTopic().merge_models(loaded_models)
-model.update_topics(documents)
-model.save("v2_viz/big-merged-model")
+model = BERTopic.load(
+    "v2_viz/big-merged-model"
+)  # model = BERTopic().merge_models(loaded_models)
 
 representative_docs = model.get_representative_docs(3)
 print(representative_docs)
