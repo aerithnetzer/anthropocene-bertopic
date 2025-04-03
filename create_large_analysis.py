@@ -9,17 +9,9 @@ from sentence_transformers import SentenceTransformer
 import argparse
 from nltk.corpus import stopwords, words
 
-parser = argparse.ArgumentParser(
-    prog="ProgramName",
-    description="What the program does",
-    epilog="Text at the bottom of help",
-)
-parser.add_argument("batch_number")
 
-
-def main():
-    args = parser.parse_args()
-    batch_number = args.batch_number
+def main(i):
+    batch_number = i
     # Download necessary NLTK datasets
     nltk.download("stopwords")
     nltk.download("words")
