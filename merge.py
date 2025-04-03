@@ -55,7 +55,7 @@ model = BERTopic.load(
     "v2_viz/big-merged-model"
 )  # model = BERTopic().merge_models(loaded_models)
 
-representative_docs = model.get_representative_docs(3)
+representative_docs = model.get_representative_docs()
 print(representative_docs)
 
 for doc in representative_docs:
