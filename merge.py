@@ -2,6 +2,7 @@ import cudf
 import glob
 from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
+import pandas as pd
 
 # Load pre-trained SentenceTransformer model
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -64,7 +65,12 @@ batch_number = "999"
 
 topics = model.topics_
 print(type(topics))
-print(topics[0:10])
+
+indices = topics.index(3)
+for index in indices:
+    print(titles[index])
+
+
 print("Topics:", len(topics))
 
 # Generate visualizations
