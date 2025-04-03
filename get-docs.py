@@ -17,7 +17,9 @@ def main():
     topic_number = args.topic_num
 
     # Load the BERTopic model
-    topic_model = BERTopic(verbose=True).load(f"./topic_model_batch_{model_number}")
+    topic_model = BERTopic(verbose=True).load(
+        f"./large-bertopic-testtopic_model_batch_{model_number}"
+    )
 
     # Get representative documents
     representative_docs = topic_model.get_representative_docs(topic_number)

@@ -54,7 +54,7 @@ print("Category:", categories[0])
 model = BERTopic.load(
     "v2_viz/big-merged-model"
 )  # model = BERTopic().merge_models(loaded_models)
-
+model.update_topics(documents)
 representative_docs = model.get_representative_docs()
 print(representative_docs)
 
