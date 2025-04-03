@@ -47,7 +47,7 @@ for h5_file in h5_files:
 print(len(dates), len(documents), len(categories))
 
 # Merge BERTopic models
-model = BERTopic.load(
+model = BERTopic(verbose=True).load(
     "v2_viz/big-merged-model"
 )  # model = BERTopic().merge_models(loaded_models)
 model.update_topics(documents)
