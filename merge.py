@@ -72,6 +72,12 @@ topics = list(model.topics_)
 print(type(topics))
 indices = find_indices(topics, 3)
 
+df = pd.DataFrame(
+    {"title": titles, "topic": topics, "category": categories, "date": dates}
+)
+
+df.to_excel("./ice-data.xlsx")
+
 for index in indices:
     print(titles[index])
 
