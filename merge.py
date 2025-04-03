@@ -45,17 +45,13 @@ for h5_file in h5_files:
 
 # Check dataset sizes
 print(len(dates), len(documents), len(categories))
-print("Sample Data:")
-print("Date:", dates[0])
-print("Doc:", documents[0])
-print("Category:", categories[0])
 
 # Merge BERTopic models
 model = BERTopic.load(
     "v2_viz/big-merged-model"
 )  # model = BERTopic().merge_models(loaded_models)
 model.update_topics(documents)
-representative_docs = model.get_representative_docs()
+representative_docs = model.get_representative_docs(3)
 print(representative_docs)
 
 for doc in representative_docs:
