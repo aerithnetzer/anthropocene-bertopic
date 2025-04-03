@@ -72,7 +72,7 @@ print("Calculating topics per category")
 topics_per_class = model.topics_per_class(docs=documents, classes=categories)
 model.visualize_topics_per_class(
     topics_per_class, top_n_topics=50, normalize_frequency=True
-)
+).write_html(f"v2_viz/categories-{batch_number}.html")
 
 model.visualize_hierarchy(top_n_topics=20).write_html(
     f"v2_viz/hierarchy-{batch_number}.html"
