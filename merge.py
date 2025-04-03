@@ -63,10 +63,15 @@ model = BERTopic(verbose=True).load(
 # Define batch number
 batch_number = "999"
 
-topics = model.topics_
-print(type(topics))
 
-indices = topics.index(3)
+def find_indices(lst, value):
+    return [i for i, v in enumerate(lst) if v == value]
+
+
+topics = list(model.topics_)
+print(type(topics))
+indices = find_indices(topics, 3)
+
 for index in indices:
     print(titles[index])
 
